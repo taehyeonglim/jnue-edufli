@@ -253,6 +253,7 @@ p:last-child {
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: var(--space-6);
 }
 
 .card-hover:hover {
@@ -410,7 +411,7 @@ p:last-child {
 /* ========== INPUTS ========== */
 .input {
   width: 100%;
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   background: var(--surface-elevated);
   border: 2px solid rgba(0, 0, 0, 0.06);
   border-radius: var(--radius-md);

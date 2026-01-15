@@ -168,16 +168,16 @@ export default function Ranking() {
           )}
 
           {/* Tier Legend */}
-          <div className="card p-4 mb-6">
-            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">티어 기준</h3>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          <div className="card p-6 mb-6">
+            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-4">티어 기준</h3>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
               {(['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master'] as TierType[]).map((tier) => (
                 <div
                   key={tier}
-                  className="flex items-center gap-1.5 px-2 py-1.5 bg-gray-50 rounded border border-gray-200"
+                  className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 rounded-lg border border-gray-200"
                 >
-                  <span className="text-sm">{TIER_INFO[tier].emoji}</span>
-                  <span className="text-xs font-medium" style={{ color: TIER_INFO[tier].color }}>
+                  <span className="text-base">{TIER_INFO[tier].emoji}</span>
+                  <span className="text-sm font-medium" style={{ color: TIER_INFO[tier].color }}>
                     {TIER_THRESHOLDS[tier].min}P+
                   </span>
                 </div>
@@ -188,7 +188,10 @@ export default function Ranking() {
           {/* Ranking List */}
           <div className="card overflow-hidden">
             {/* Header */}
-            <div className="grid grid-cols-[3rem_1fr_auto_6rem] gap-3 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200">
+            <div
+              className="grid grid-cols-[3rem_1fr_auto_6rem] gap-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200"
+              style={{ padding: '1.25rem 1.5rem' }}
+            >
               <span className="text-center">#</span>
               <span>유저</span>
               <span className="text-center">티어</span>
@@ -256,9 +259,10 @@ function RankingRow({
 
   return (
     <div
-      className={`grid grid-cols-[3rem_1fr_auto_6rem] gap-3 p-4 items-center border-b border-gray-200 transition-colors ${
+      className={`grid grid-cols-[3rem_1fr_auto_6rem] gap-4 items-center border-b border-gray-200 transition-colors ${
         isCurrentUser ? 'bg-blue-50' : 'hover:bg-gray-50'
       }`}
+      style={{ padding: '1.25rem 1.5rem' }}
     >
       <span className={`text-center ${rankDisplay.className}`}>
         {rankDisplay.emoji}

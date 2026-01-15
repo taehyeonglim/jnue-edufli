@@ -81,12 +81,12 @@ export default function Home() {
         <div className="container relative">
           <div className="text-center max-w-3xl mx-auto">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2.5 px-5 py-2.5 mb-10 bg-white/80 backdrop-blur-xl rounded-full border border-white/50 shadow-lg shadow-black/[0.03]">
+            <div className="inline-flex items-center gap-2.5 py-2.5 mb-10 bg-white/80 backdrop-blur-xl rounded-full border border-white/50 shadow-lg shadow-black/[0.03]" style={{ paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent-500"></span>
               </span>
-              <span className="text-sm font-medium text-slate-600">전주교대 교육공학 동아리</span>
+              <span className="text-sm font-medium text-slate-600">전주교육대학교 초등교육과 교육공학 동아리</span>
             </div>
 
             {/* Title */}
@@ -101,7 +101,7 @@ export default function Home() {
             </p>
 
             <p className="text-slate-500 text-lg mb-12 max-w-xl mx-auto">
-              함께 배우고 성장하는 교육 혁신 커뮤니티
+              교육과 기술의 만남, 그 중심에 내가 있다
             </p>
 
             {/* CTA Buttons */}
@@ -132,34 +132,35 @@ export default function Home() {
         <section className="py-20 md:py-28">
           <div className="container">
             <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 px-4 py-2 mb-5 bg-accent-50 rounded-full">
+              <div className="inline-flex items-center gap-2 mb-5 bg-accent-50 rounded-full" style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
                 <span className="text-lg">👥</span>
-                <span className="text-sm font-medium text-accent-600">Community</span>
+                <span className="text-sm font-medium text-accent-600">Members</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">동아리원</h2>
-              <p className="text-slate-500">함께하는 멤버들을 만나보세요</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">반가워요!</h2>
+              <p className="text-slate-500">카드에 마우스를 올려보세요</p>
             </div>
 
             <div
               ref={carouselRef}
-              className="flex gap-5 overflow-x-auto pt-3 pr-3 pb-6 scrollbar-hide scroll-smooth"
+              className="flex gap-5 overflow-x-auto pt-3 pr-3 pb-6 scrollbar-hide scroll-smooth justify-center"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
             >
               {members.map((member, index) => (
-                <MemberCard key={member.uid} member={member} rank={index + 1} />
+                <MemberCard key={member.uid} member={member} rank={index + 1} isAdmin={currentUser?.isAdmin} />
               ))}
             </div>
 
             <div className="flex justify-center mt-10">
               <Link
                 to="/ranking"
-                className="group inline-flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-lg rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-white hover:border-primary-200 hover:text-primary-600 transition-all duration-300"
+                className="group inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all duration-300"
               >
+                <span className="text-lg">🏆</span>
                 <span>전체 랭킹 보기</span>
-                <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>
             </div>
@@ -176,7 +177,7 @@ export default function Home() {
       <section style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
         <div className="container-sm">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 px-4 py-2 mb-5 bg-primary-50 rounded-full">
+            <div className="inline-flex items-center gap-2 mb-5 bg-primary-50 rounded-full" style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
               <span className="text-lg">📋</span>
               <span className="text-sm font-medium text-primary-600">Boards</span>
             </div>
@@ -230,7 +231,7 @@ export default function Home() {
       <section style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
         <div className="container-sm">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 px-4 py-2 mb-5 bg-warm-light/30 rounded-full">
+            <div className="inline-flex items-center gap-2 mb-5 bg-warm-light/30 rounded-full" style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
               <span className="text-lg">🏅</span>
               <span className="text-sm font-medium text-amber-600">Growth System</span>
             </div>
@@ -377,7 +378,7 @@ function PointItem({ label, points, icon }: { label: string; points: number; ico
   )
 }
 
-function MemberCard({ member, rank }: { member: User; rank: number }) {
+function MemberCard({ member, rank, isAdmin }: { member: User; rank: number; isAdmin?: boolean }) {
   const tierInfo = TIER_INFO[member.tier] || TIER_INFO.bronze
   const displayName = member.nickname || member.displayName
 
@@ -397,8 +398,8 @@ function MemberCard({ member, rank }: { member: User; rank: number }) {
             backfaceVisibility: 'hidden',
           }}
         >
-          {/* Rank Badge */}
-          {rank <= 3 && (
+          {/* Rank Badge - 관리자에게는 표시하지 않음 */}
+          {!isAdmin && rank <= 3 && (
             <div
               className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-lg"
               style={{
@@ -454,39 +455,29 @@ function MemberCard({ member, rank }: { member: User; rank: number }) {
 
         {/* Back Side */}
         <div
-          className="absolute inset-0 rounded-2xl border border-primary-200/50 p-4 flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-white to-primary-50/30 backdrop-blur-xl shadow-lg"
+          className="absolute inset-0 rounded-2xl border border-primary-200/50 p-4 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-white to-primary-50/30 backdrop-blur-xl shadow-lg"
           style={{
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
           }}
         >
           {/* Tier Emoji */}
-          <div className="text-3xl mb-1 drop-shadow-md">{tierInfo.emoji}</div>
+          <div className="text-4xl mb-2 drop-shadow-md">{tierInfo.emoji}</div>
 
-          {/* Department */}
+          {/* Real Name (stored in studentId) */}
           <div className="w-full text-center">
-            <p className="text-[10px] text-slate-400 mb-0.5">학과</p>
-            <p className="text-xs font-semibold text-slate-700 truncate">
-              {member.department || '미등록'}
+            <p className="text-[10px] text-slate-400 mb-0.5">이름</p>
+            <p className="text-sm font-semibold text-slate-700 truncate">
+              {member.studentId || '미등록'}
             </p>
           </div>
 
           {/* Interests */}
           <div className="w-full text-center">
             <p className="text-[10px] text-slate-400 mb-0.5">관심분야</p>
-            <p className="text-xs font-semibold text-primary-600 truncate">
+            <p className="text-sm font-semibold text-primary-600 truncate">
               {member.interests && member.interests.length > 0
                 ? member.interests.slice(0, 2).join(', ')
-                : '미등록'}
-            </p>
-          </div>
-
-          {/* Skills */}
-          <div className="w-full text-center">
-            <p className="text-[10px] text-slate-400 mb-0.5">보유 기술</p>
-            <p className="text-xs font-semibold text-accent-600 truncate">
-              {member.skills && member.skills.length > 0
-                ? member.skills.slice(0, 2).join(', ')
                 : '미등록'}
             </p>
           </div>

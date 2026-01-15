@@ -9,9 +9,11 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary-400 to-accent-400 rounded-xl blur-lg opacity-40" />
-              <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-sm">E</span>
-              </div>
+              <img
+                src="/edufli-logo.png"
+                alt="Edu FLI"
+                className="relative w-9 h-9 rounded-xl object-contain shadow-lg"
+              />
             </div>
             <div>
               <span className="font-bold text-base tracking-wide">
@@ -25,7 +27,7 @@ export default function Footer() {
           {/* Info */}
           <div className="text-center">
             <p className="text-xs text-slate-500 font-medium">
-              전주교육대학교 교육공학 동아리
+              전주교육대학교 초등교육과 교육공학 동아리
             </p>
           </div>
 

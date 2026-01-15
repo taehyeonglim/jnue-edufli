@@ -62,6 +62,7 @@ export default function Header() {
     { path: '/study', label: '스터디', icon: '📖' },
     { path: '/project', label: '프로젝트', icon: '🚀' },
     { path: '/resources', label: '자료실', icon: '📁' },
+    { path: '/gallery', label: '갤러리', icon: '📷' },
     { path: '/ranking', label: '랭킹', icon: '🏆' },
   ]
 
@@ -95,7 +96,7 @@ export default function Header() {
                 <span className="bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">Edu</span>
                 <span className="bg-gradient-to-r from-accent-500 to-accent-600 bg-clip-text text-transparent"> FLI</span>
               </span>
-              <p className="text-[10px] text-slate-400 tracking-wider font-medium">Education & Future Learning</p>
+              <p className="text-[10px] text-slate-400 tracking-wider font-medium">Education & Future Learning Innovation</p>
             </div>
           </Link>
 

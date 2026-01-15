@@ -86,14 +86,14 @@ export default function OnlineUsers() {
   if (!currentUser) return null
 
   return (
-    <div className="fixed bottom-5 right-5 z-40">
+    <div className="fixed bottom-8 right-5 z-40">
       <div className="bg-white rounded-2xl shadow-xl border border-gray-200 w-72 overflow-hidden">
         {/* Header */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
         >
-          <div className="flex items-center gap-2.5 ml-1">
+          <div className="flex items-center gap-2.5" style={{ marginLeft: '0.5rem' }}>
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
@@ -123,7 +123,7 @@ export default function OnlineUsers() {
                 <p className="text-sm text-gray-400">접속 중인 유저가 없습니다</p>
               </div>
             ) : (
-              <div className="max-h-60 overflow-y-auto py-2">
+              <div className="py-2">
                 {onlineUsers.map((user) => {
                   const tierInfo = TIER_INFO[user.tier] || TIER_INFO.bronze
                   return (
@@ -171,7 +171,7 @@ export default function OnlineUsers() {
 
         {/* Collapsed avatars */}
         {!isExpanded && onlineUsers.length > 0 && (
-          <div className="px-6 pb-4 flex items-center ml-2">
+          <div className="pb-4 flex items-center" style={{ paddingLeft: '2rem' }}>
             <div className="flex -space-x-2">
               {onlineUsers.slice(0, 4).map((user) => (
                 <img

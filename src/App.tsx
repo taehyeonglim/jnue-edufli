@@ -17,6 +17,7 @@ import Ranking from './pages/Ranking'
 import MyPage from './pages/MyPage'
 import Messages from './pages/Messages'
 import Admin from './pages/Admin'
+import Gallery from './pages/Gallery'
 
 export default function App() {
   const { loading } = useAuth()
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="resources" element={<ResourcesBoard />} />
         <Route path="post/:id" element={<PostDetail />} />
         <Route path="ranking" element={<Ranking />} />
+        <Route path="gallery" element={<Gallery />} />
 
         {/* Protected Routes */}
         <Route

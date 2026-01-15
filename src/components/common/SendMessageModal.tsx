@@ -67,7 +67,7 @@ export default function SendMessageModal({
       {/* Modal */}
       <div className="relative bg-white rounded-lg border border-gray-200 w-full max-w-lg shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <span className="text-xl">💌</span>
             <h2 className="text-lg font-semibold text-blue-600">쪽지 보내기</h2>
@@ -83,7 +83,7 @@ export default function SendMessageModal({
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="p-4">
+        <form onSubmit={handleSubmit} className="p-6">
           {/* Receiver Info */}
           <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded border border-gray-200">
             <span className="text-sm text-gray-500">받는 사람:</span>

@@ -217,7 +217,7 @@ function MessageListItem({
   return (
     <div
       onClick={onClick}
-      className={`p-4 border-b border-gray-200 cursor-pointer transition-colors ${
+      className={`p-5 border-b border-gray-200 cursor-pointer transition-colors ${
         isSelected
           ? 'bg-blue-50'
           : isUnread

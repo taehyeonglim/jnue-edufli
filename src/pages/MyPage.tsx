@@ -5,7 +5,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from '../config/firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { getUserPosts } from '../services/postService'
-import { Post, TIER_INFO, TIER_THRESHOLDS, TierType, DEPARTMENTS, INTEREST_OPTIONS, SKILL_OPTIONS, CATEGORY_INFO, CategoryType } from '../types'
+import { Post, TIER_INFO, TIER_THRESHOLDS, TierType, INTEREST_OPTIONS, SKILL_OPTIONS, CATEGORY_INFO, CategoryType } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 
 export default function MyPage() {
@@ -19,8 +19,6 @@ export default function MyPage() {
 
   const [nickname, setNickname] = useState('')
   const [studentId, setStudentId] = useState('')
-  const [department, setDepartment] = useState('')
-  const [year, setYear] = useState<number | undefined>()
   const [interests, setInterests] = useState<string[]>([])
   const [skills, setSkills] = useState<string[]>([])
 
@@ -37,8 +35,6 @@ export default function MyPage() {
       setPosts(userPosts)
       setNickname(currentUser.nickname || currentUser.displayName || '')
       setStudentId(currentUser.studentId || '')
-      setDepartment(currentUser.department || '')
-      setYear(currentUser.year)
       setInterests(currentUser.interests || [])
       setSkills(currentUser.skills || [])
     } catch (error) {
@@ -101,8 +97,6 @@ export default function MyPage() {
       await updateDoc(userRef, {
         nickname: nickname.trim(),
         studentId: studentId.trim(),
-        department,
-        year: year || null,
         interests,
         skills,
       })
@@ -346,30 +340,18 @@ export default function MyPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">학번</label>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">이름</label>
                     <input
                       type="text"
                       value={studentId}
                       onChange={(e) => setStudentId(e.target.value)}
-                      placeholder="예: 20231234"
+                      placeholder="실명을 입력하세요"
                       className="input"
-                      maxLength={10}
+                      maxLength={20}
                     />
+                    <p className="text-xs text-gray-500 mt-1.5">실명을 입력해주세요.</p>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">학과</label>
-                    <select
-                      value={department}
-                      onChange={(e) => setDepartment(e.target.value)}
-                      className="input select"
-                    >
-                      <option value="">선택하세요</option>
-                      {DEPARTMENTS.map((dept) => (
-                        <option key={dept} value={dept}>{dept}</option>
-                      ))}
-                    </select>
-                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-900 mb-2">관심 분야</label>
