@@ -142,7 +142,7 @@ export default function Home() {
 
             <div
               ref={carouselRef}
-              className="flex gap-5 overflow-x-auto pt-3 pr-3 pb-6 scrollbar-hide scroll-smooth justify-center"
+              className="flex gap-5 overflow-x-auto pt-3 pr-3 pb-6 scroll-smooth justify-center"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
@@ -464,11 +464,11 @@ function MemberCard({ member, rank, isAdmin }: { member: User; rank: number; isA
           {/* Tier Emoji */}
           <div className="text-4xl mb-2 drop-shadow-md">{tierInfo.emoji}</div>
 
-          {/* Real Name (stored in studentId) */}
+          {/* Department */}
           <div className="w-full text-center">
-            <p className="text-[10px] text-slate-400 mb-0.5">이름</p>
+            <p className="text-[10px] text-slate-400 mb-0.5">학과</p>
             <p className="text-sm font-semibold text-slate-700 truncate">
-              {member.studentId || '미등록'}
+              {member.department || '미등록'}
             </p>
           </div>
 

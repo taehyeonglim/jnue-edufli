@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { createPost, uploadPostImage } from '../services/postService'
@@ -17,6 +17,14 @@ export default function WritePost() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview?.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview)
+      }
+    }
+  }, [imagePreview])
 
   const getCategoryInfo = () => {
     switch (category) {
@@ -80,6 +88,9 @@ export default function WritePost() {
       return false
     }
     setImageFile(file)
+    if (imagePreview?.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreview)
+    }
     setImagePreview(URL.createObjectURL(file))
     setError('')
     return true
@@ -139,7 +150,7 @@ export default function WritePost() {
         imageURL = await uploadPostImage(imageFile, currentUser.uid)
       }
 
-      const postId = await createPost(currentUser, title.trim(), content.trim(), category, imageURL)
+      const postId = await createPost(title.trim(), content.trim(), category, imageURL)
       await refreshUser()
       navigate(`/post/${postId}`)
     } catch (err) {

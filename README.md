@@ -94,6 +94,19 @@ npm run preview
 npm run lint
 ```
 
+### Firebase 보안/함수 배포
+
+```bash
+# Functions 의존성 설치
+cd functions
+npm install
+npm run build
+cd ..
+
+# Firestore/Storage Rules + Indexes + Functions 배포
+firebase deploy --only firestore:rules,firestore:indexes,storage,functions
+```
+
 ---
 
 ## 프로젝트 구조

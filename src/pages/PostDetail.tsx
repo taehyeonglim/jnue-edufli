@@ -36,13 +36,13 @@ export default function PostDetail() {
   const handleLike = async () => {
     if (!currentUser || !post) return
     try {
-      const liked = await toggleLike(post.id, currentUser.uid, post.authorId)
+      const { liked } = await toggleLike(post.id)
       setPost((prev) => {
         if (!prev) return prev
         return {
           ...prev,
           likes: liked
-            ? [...prev.likes, currentUser.uid]
+            ? Array.from(new Set([...prev.likes, currentUser.uid]))
             : prev.likes.filter((uid) => uid !== currentUser.uid),
         }
       })
@@ -58,7 +58,7 @@ export default function PostDetail() {
 
     setSubmitting(true)
     try {
-      const newComment = await addComment(post.id, currentUser, commentText.trim())
+      const newComment = await addComment(post.id, commentText.trim())
       setPost((prev) => {
         if (!prev) return prev
         return {
@@ -78,7 +78,7 @@ export default function PostDetail() {
   const handleDeletePost = async () => {
     if (!post || !window.confirm('정말 삭제하시겠습니까?')) return
     try {
-      await deletePost(post.id, post.authorId, post.category)
+      await deletePost(post.id)
       await refreshUser()
       navigate(-1)
     } catch (error) {
@@ -89,7 +89,7 @@ export default function PostDetail() {
   const handleDeleteComment = async (comment: Comment) => {
     if (!post || !window.confirm('댓글을 삭제하시겠습니까?')) return
     try {
-      await deleteComment(post.id, comment)
+      await deleteComment(post.id, comment.id)
       setPost((prev) => {
         if (!prev) return prev
         return {
@@ -241,7 +241,7 @@ export default function PostDetail() {
             <div className="flex items-center gap-4 mt-8 pt-5 border-t border-gray-200">
               <button
                 onClick={handleLike}
-                disabled={!currentUser}
+                disabled={!currentUser || isAuthor}
                 className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-medium transition-all ${
                   isLiked
                     ? 'bg-red-500/15 text-red-400 border border-red-400/30'

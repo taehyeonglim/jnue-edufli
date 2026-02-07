@@ -22,6 +22,14 @@ export default function Gallery() {
     loadImages()
   }, [])
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
+
   const loadImages = async () => {
     try {
       const data = await getGalleryImages()
@@ -36,6 +44,17 @@ export default function Gallery() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('파일 크기는 5MB 이하여야 합니다.')
+        return
+      }
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드할 수 있습니다.')
+        return
+      }
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
       setUploadFile(file)
       const url = URL.createObjectURL(file)
       setPreviewUrl(url)

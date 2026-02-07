@@ -16,7 +16,7 @@ export default function StudyBoard() {
 
   const loadPosts = async () => {
     try {
-      const data = await getPosts('study')
+      const { posts: data } = await getPosts('study', 50)
       setPosts(data)
     } catch (error) {
       console.error('게시글 로딩 실패:', error)

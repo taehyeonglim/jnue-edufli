@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, getDocs, doc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { User, Reward, TIER_INFO, TierType, TIER_THRESHOLDS } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { Navigate } from 'react-router-dom'
+import { adminAdjustPoints, adminSetRole } from '../services/adminService'
 
 type Tab = 'users' | 'rewards' | 'challenger'
 
@@ -171,7 +172,8 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
     }
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
+      await adminSetRole({
+        targetUid: user.uid,
         isAdmin: !user.isAdmin,
       })
       onUpdate()
@@ -191,9 +193,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
     }
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
-        points: Math.max(0, user.points + points),
-      })
+      await adminAdjustPoints(user.uid, points)
       onUpdate()
     } catch (error) {
       console.error('포인트 조정 실패:', error)
@@ -234,7 +234,8 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
     }
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
+      await adminSetRole({
+        targetUid: user.uid,
         isTestAccount: !user.isTestAccount,
       })
       onUpdate()
@@ -275,7 +276,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
           <span className="w-56 text-right">액션</span>
         </div>
 
-        <div className="divide-y divide-[#1E2328]">
+        <div className="divide-y divide-gray-200">
           {filteredUsers.map((user) => {
             const tierInfo = TIER_INFO[user.tier]
             return (
@@ -398,9 +399,9 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
     }
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
+      await adminSetRole({
+        targetUid: user.uid,
         isChallenger: !user.isChallenger,
-        tier: user.isChallenger ? 'master' : 'challenger',
       })
       onUpdate()
     } catch (error) {
@@ -468,7 +469,7 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
           </p>
         </div>
 
-        <div className="divide-y divide-[#1E2328]">
+        <div className="divide-y divide-gray-200">
           {nonChallengers.slice(0, 20).map((user, index) => {
             const tierInfo = TIER_INFO[user.tier]
             return (
@@ -642,7 +643,7 @@ function RewardsTab({
               <p className="text-gray-500">아직 지급 내역이 없습니다</p>
             </div>
           ) : (
-            <div className="divide-y divide-[#1E2328]">
+            <div className="divide-y divide-gray-200">
               {rewards.map((reward) => (
                 <div key={reward.id} className="p-4 hover:bg-gray-50 transition-colors">
                   <div className="flex items-start gap-3">

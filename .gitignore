@@ -29,3 +29,8 @@ npm-debug.log*
 
 # Vite
 vite.config.ts.timestamp-*
+
+# Local temporary artifacts
+tmpclaude-*
+functions/node_modules/
+functions/lib/
