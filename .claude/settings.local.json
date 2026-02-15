@@ -19,7 +19,15 @@
       "mcp__filesystem__read_text_file",
       "mcp__filesystem__directory_tree",
       "Bash(npx firebase login:*)",
-      "Bash(npx firebase deploy:*)"
+      "Bash(npx firebase deploy:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)",
+      "Bash(npx vite build)",
+      "Bash(git -C \"c:\\\\Users\\\\user\\\\Documents\\\\GitHub\\\\jnue-edufli\" status)",
+      "Bash(git -C \"c:\\\\Users\\\\user\\\\Documents\\\\GitHub\\\\jnue-edufli\" diff)",
+      "Bash(git -C \"c:\\\\Users\\\\user\\\\Documents\\\\GitHub\\\\jnue-edufli\" log --oneline -5)",
+      "Bash(git -C \"c:\\\\Users\\\\user\\\\Documents\\\\GitHub\\\\jnue-edufli\" add index.html package.json package-lock.json src/App.tsx src/components/common/OnlineUsers.tsx src/components/common/ErrorBoundary.tsx src/components/common/PostItem.tsx src/contexts/AuthContext.tsx src/index.css src/pages/Admin.tsx src/pages/EditPost.tsx src/pages/Gallery.tsx src/pages/Introduction.tsx src/pages/MyPage.tsx src/pages/PostDetail.tsx src/pages/ProjectBoard.tsx src/pages/Ranking.tsx src/pages/ResourcesBoard.tsx src/pages/StudyBoard.tsx src/pages/WritePost.tsx src/services/postService.ts src/utils/helpers.ts)",
+      "Bash(git -C \"c:\\\\Users\\\\user\\\\Documents\\\\GitHub\\\\jnue-edufli\" commit -m \"$\\(cat <<''EOF''\nComprehensive code review fixes and refactoring\n\n- Fix Firestore queries: use where/orderBy instead of full collection scans\n- Fix comment deletion: replace arrayRemove with read-filter-write for Timestamp precision\n- Fix challenger tier removal: recalculate tier from points instead of hardcoding master\n- Fix Admin adjustPoints: recalculate tier on point changes\n- Fix memory leaks: revoke blob ObjectURLs in WritePost, EditPost image handling\n- Add React.lazy/Suspense code splitting for all page routes \\(bundle 718KB -> 616KB\\)\n- Add ErrorBoundary component wrapping entire app\n- Extract shared PostItem component \\(eliminates 4 duplicate implementations\\)\n- Extract shared helpers: getNextTier, getCategoryRoute, getCategoryLabel\n- Remove duplicated calculateTier from OnlineUsers, import from AuthContext\n- Add Pretendard Variable font CDN for Korean typography\n- Move vite, plugin-react, tailwindcss/postcss to devDependencies\n- Add 404 catch-all route\n- Add card-primary and card-gold CSS utility classes\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
