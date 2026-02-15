@@ -65,7 +65,8 @@ export interface User {
   isTestAccount?: boolean
   createdAt: Date
   introduction?: string
-  studentId?: string
+  realName?: string
+  studentId?: string // 학번
   // 교육공학 동아리 특화 필드
   department?: string      // 학과
   year?: number           // 학년 (1-4)

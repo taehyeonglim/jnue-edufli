@@ -17,7 +17,7 @@ export default function Introduction() {
 
   const loadPosts = async () => {
     try {
-      const data = await getPosts('introduction')
+      const { posts: data } = await getPosts('introduction', 50)
       setPosts(data)
     } catch (error) {
       console.error('게시글 로딩 실패:', error)

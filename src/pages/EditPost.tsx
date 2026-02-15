@@ -23,6 +23,14 @@ export default function EditPost() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    return () => {
+      if (imagePreview?.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview)
+      }
+    }
+  }, [imagePreview])
+
+  useEffect(() => {
     loadPost()
   }, [id])
 
@@ -55,10 +63,10 @@ export default function EditPost() {
       return false
     }
     setImageFile(file)
-    setImagePreview((prev) => {
-      if (prev && prev.startsWith('blob:')) URL.revokeObjectURL(prev)
-      return URL.createObjectURL(file)
-    })
+    if (imagePreview?.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreview)
+    }
+    setImagePreview(URL.createObjectURL(file))
     setRemoveImage(false)
     setError('')
     return true

@@ -17,7 +17,7 @@ export default function ProjectBoard() {
 
   const loadPosts = async () => {
     try {
-      const data = await getPosts('project')
+      const { posts: data } = await getPosts('project', 50)
       setPosts(data)
     } catch (error) {
       console.error('게시글 로딩 실패:', error)

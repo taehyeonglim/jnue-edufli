@@ -19,6 +19,7 @@ export default function MyPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [nickname, setNickname] = useState('')
+  const [realName, setRealName] = useState('')
   const [studentId, setStudentId] = useState('')
   const [interests, setInterests] = useState<string[]>([])
   const [skills, setSkills] = useState<string[]>([])
@@ -32,9 +33,10 @@ export default function MyPage() {
   const loadData = async () => {
     if (!currentUser) return
     try {
-      const userPosts = await getUserPosts(currentUser.uid)
+      const { posts: userPosts } = await getUserPosts(currentUser.uid, 100)
       setPosts(userPosts)
       setNickname(currentUser.nickname || currentUser.displayName || '')
+      setRealName(currentUser.realName || '')
       setStudentId(currentUser.studentId || '')
       setInterests(currentUser.interests || [])
       setSkills(currentUser.skills || [])
@@ -97,6 +99,7 @@ export default function MyPage() {
       const userRef = doc(db, 'users', currentUser.uid)
       await updateDoc(userRef, {
         nickname: nickname.trim(),
+        realName: realName.trim(),
         studentId: studentId.trim(),
         interests,
         skills,
@@ -172,7 +175,7 @@ export default function MyPage() {
       <div className="section">
         <div className="container-sm">
           {/* Profile Header Card */}
-          <div className="card card-primary p-6 mb-6">
+          <div className="card p-6 mb-6">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
               {/* Avatar */}
               <div className="relative group shrink-0">
@@ -321,16 +324,33 @@ export default function MyPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">이름</label>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                      실명 <span className="text-xs text-gray-500">(비공개)</span>
+                    </label>
                     <input
                       type="text"
-                      value={studentId}
-                      onChange={(e) => setStudentId(e.target.value)}
+                      value={realName}
+                      onChange={(e) => setRealName(e.target.value)}
                       placeholder="실명을 입력하세요"
                       className="input"
                       maxLength={20}
                     />
-                    <p className="text-xs text-gray-500 mt-1.5">실명을 입력해주세요.</p>
+                    <p className="text-xs text-gray-500 mt-1.5">본인과 관리자만 확인할 수 있습니다.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                      학번 <span className="text-xs text-gray-500">(비공개)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={studentId}
+                      onChange={(e) => setStudentId(e.target.value)}
+                      placeholder="학번을 입력하세요"
+                      className="input"
+                      maxLength={20}
+                    />
+                    <p className="text-xs text-gray-500 mt-1.5">본인과 관리자만 확인할 수 있습니다.</p>
                   </div>
 
 

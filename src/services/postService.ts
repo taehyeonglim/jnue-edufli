@@ -1,26 +1,50 @@
 import {
   collection,
   doc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
   getDoc,
   getDocs,
-  query,
-  where,
+  limit,
   orderBy,
-  serverTimestamp,
-  arrayUnion,
-  arrayRemove,
-  Timestamp
+  query,
+  startAfter,
+  Timestamp,
+  updateDoc,
+  where,
+  QueryConstraint,
+  QueryDocumentSnapshot,
+  DocumentData,
 } from 'firebase/firestore'
+import { httpsCallable } from 'firebase/functions'
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
-import { db, storage } from '../config/firebase'
-import { Post, Comment, User, POINT_VALUES } from '../types'
-import { calculateTier } from '../contexts/AuthContext'
+import { db, storage, functions } from '../config/firebase'
+import { Post, Comment } from '../types'
 
 const POSTS_COLLECTION = 'posts'
-const USERS_COLLECTION = 'users'
+
+const createPostCallable = httpsCallable<
+  { title: string; content: string; category: Post['category']; imageURL?: string | null },
+  { postId: string }
+>(functions, 'createPost')
+const toggleLikeCallable = httpsCallable<{ postId: string }, { liked: boolean; likesCount: number }>(
+  functions,
+  'togglePostLike',
+)
+const addCommentCallable = httpsCallable<
+  { postId: string; content: string },
+  {
+    comment: Omit<Comment, 'createdAt'> & { createdAt: number }
+  }
+>(functions, 'addPostComment')
+const deleteCommentCallable = httpsCallable<{ postId: string; commentId: string }, { success: boolean }>(
+  functions,
+  'deletePostComment',
+)
+const deletePostCallable = httpsCallable<{ postId: string }, { success: boolean }>(functions, 'deletePost')
+
+export interface PaginatedPosts {
+  posts: Post[]
+  cursor: QueryDocumentSnapshot<DocumentData> | null
+}
 
 export async function uploadPostImage(file: File, userId: string): Promise<string> {
   const timestamp = Date.now()
@@ -28,9 +52,7 @@ export async function uploadPostImage(file: File, userId: string): Promise<strin
   const storageRef = ref(storage, fileName)
 
   await uploadBytes(storageRef, file)
-  const downloadURL = await getDownloadURL(storageRef)
-
-  return downloadURL
+  return getDownloadURL(storageRef)
 }
 
 export async function deletePostImage(imageURL: string): Promise<void> {
@@ -43,52 +65,57 @@ export async function deletePostImage(imageURL: string): Promise<void> {
 }
 
 export async function createPost(
-  user: User,
   title: string,
   content: string,
   category: Post['category'],
-  imageURL?: string
+  imageURL?: string,
 ): Promise<string> {
-  const postData: Record<string, unknown> = {
-    authorId: user.uid,
-    authorName: user.nickname || user.displayName,
-    authorPhotoURL: user.photoURL,
-    authorTier: user.tier,
+  const result = await createPostCallable({
     title,
     content,
     category,
-    likes: [],
-    comments: [],
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  }
-
-  if (imageURL) {
-    postData.imageURL = imageURL
-  }
-
-  const docRef = await addDoc(collection(db, POSTS_COLLECTION), postData)
-
-  // 포인트 지급 (자기소개는 50점, 일반 게시글은 10점)
-  const points = category === 'introduction' ? POINT_VALUES.INTRODUCTION : POINT_VALUES.POST
-  await addPoints(user.uid, points)
-
-  return docRef.id
+    imageURL: imageURL || null,
+  })
+  return result.data.postId
 }
 
-export async function getPosts(category?: Post['category']): Promise<Post[]> {
-  const q = category
-    ? query(collection(db, POSTS_COLLECTION), where('category', '==', category), orderBy('createdAt', 'desc'))
-    : query(collection(db, POSTS_COLLECTION), orderBy('createdAt', 'desc'))
+function parsePost(docId: string, data: DocumentData): Post {
+  return {
+    id: docId,
+    ...data,
+    createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
+    updatedAt: (data.updatedAt as Timestamp)?.toDate() || new Date(),
+    comments: Array.isArray(data.comments)
+      ? data.comments.map((comment: Comment & { createdAt: Timestamp | Date }) => ({
+          ...comment,
+          createdAt:
+            comment.createdAt instanceof Timestamp ? comment.createdAt.toDate() : new Date(comment.createdAt),
+        }))
+      : [],
+  } as Post
+}
 
-  const snapshot = await getDocs(q)
+export async function getPosts(
+  category?: Post['category'],
+  pageSize = 30,
+  cursor?: QueryDocumentSnapshot<DocumentData> | null,
+): Promise<PaginatedPosts> {
+  const constraints: QueryConstraint[] = []
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: (doc.data().createdAt as Timestamp)?.toDate() || new Date(),
-    updatedAt: (doc.data().updatedAt as Timestamp)?.toDate() || new Date(),
-  })) as Post[]
+  if (category) {
+    constraints.push(where('category', '==', category))
+  }
+  constraints.push(orderBy('createdAt', 'desc'))
+  constraints.push(limit(pageSize))
+  if (cursor) {
+    constraints.push(startAfter(cursor))
+  }
+
+  const snapshot = await getDocs(query(collection(db, POSTS_COLLECTION), ...constraints))
+  const posts = snapshot.docs.map((item) => parsePost(item.id, item.data()))
+  const nextCursor = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null
+
+  return { posts, cursor: nextCursor }
 }
 
 export async function getPost(postId: string): Promise<Post | null> {
@@ -96,153 +123,63 @@ export async function getPost(postId: string): Promise<Post | null> {
   const docSnap = await getDoc(docRef)
 
   if (!docSnap.exists()) return null
-
-  return {
-    id: docSnap.id,
-    ...docSnap.data(),
-    createdAt: (docSnap.data().createdAt as Timestamp)?.toDate() || new Date(),
-    updatedAt: (docSnap.data().updatedAt as Timestamp)?.toDate() || new Date(),
-  } as Post
+  return parsePost(docSnap.id, docSnap.data())
 }
 
 export async function updatePost(
   postId: string,
   title: string,
   content: string,
-  imageURL?: string | null
+  imageURL?: string | null,
 ): Promise<void> {
   const docRef = doc(db, POSTS_COLLECTION, postId)
   const updateData: Record<string, unknown> = {
     title,
     content,
-    updatedAt: serverTimestamp(),
+    updatedAt: Timestamp.now(),
   }
 
   if (imageURL !== undefined) {
-    if (imageURL === null) {
-      updateData.imageURL = null
-    } else {
-      updateData.imageURL = imageURL
-    }
+    updateData.imageURL = imageURL
   }
 
   await updateDoc(docRef, updateData)
 }
 
-export async function deletePost(postId: string, authorId: string, category: Post['category']): Promise<void> {
-  const docRef = doc(db, POSTS_COLLECTION, postId)
-
-  // 포인트 회수 (자기소개는 50점, 일반 게시글은 10점)
-  const points = category === 'introduction' ? POINT_VALUES.INTRODUCTION : POINT_VALUES.POST
-  await addPoints(authorId, -points)
-
-  await deleteDoc(docRef)
+export async function deletePost(postId: string): Promise<void> {
+  await deletePostCallable({ postId })
 }
 
-export async function toggleLike(postId: string, userId: string, authorId: string): Promise<boolean> {
-  const docRef = doc(db, POSTS_COLLECTION, postId)
-  const docSnap = await getDoc(docRef)
-
-  if (!docSnap.exists()) return false
-
-  const likes = docSnap.data().likes || []
-  const isLiked = likes.includes(userId)
-
-  if (isLiked) {
-    await updateDoc(docRef, {
-      likes: arrayRemove(userId),
-    })
-    // 작성자 포인트 차감
-    await addPoints(authorId, -POINT_VALUES.LIKE_RECEIVED)
-  } else {
-    await updateDoc(docRef, {
-      likes: arrayUnion(userId),
-    })
-    // 작성자 포인트 지급
-    await addPoints(authorId, POINT_VALUES.LIKE_RECEIVED)
-  }
-
-  return !isLiked
+export async function toggleLike(postId: string): Promise<{ liked: boolean; likesCount: number }> {
+  const response = await toggleLikeCallable({ postId })
+  return response.data
 }
 
-export async function addComment(
-  postId: string,
-  user: User,
-  content: string
-): Promise<Comment> {
-  const docRef = doc(db, POSTS_COLLECTION, postId)
-
-  const newComment: Comment = {
-    id: crypto.randomUUID(),
-    authorId: user.uid,
-    authorName: user.nickname || user.displayName,
-    authorPhotoURL: user.photoURL,
-    authorTier: user.tier,
-    content,
-    createdAt: new Date(),
-  }
-
-  await updateDoc(docRef, {
-    comments: arrayUnion({
-      ...newComment,
-      createdAt: Timestamp.fromDate(newComment.createdAt),
-    }),
-  })
-
-  // 댓글 작성자에게 포인트 지급
-  await addPoints(user.uid, POINT_VALUES.COMMENT)
-
-  return newComment
-}
-
-export async function deleteComment(postId: string, comment: Comment): Promise<void> {
-  const docRef = doc(db, POSTS_COLLECTION, postId)
-  const docSnap = await getDoc(docRef)
-
-  if (!docSnap.exists()) return
-
-  const comments = docSnap.data().comments || []
-  const updatedComments = comments.filter((c: Record<string, unknown>) => c.id !== comment.id)
-
-  await updateDoc(docRef, { comments: updatedComments })
-
-  // 댓글 작성자 포인트 회수
-  await addPoints(comment.authorId, -POINT_VALUES.COMMENT)
-}
-
-export async function addPoints(userId: string, points: number): Promise<void> {
-  const userRef = doc(db, USERS_COLLECTION, userId)
-  const userSnap = await getDoc(userRef)
-
-  if (userSnap.exists()) {
-    const currentPoints = userSnap.data().points || 0
-    const newPoints = Math.max(0, currentPoints + points)
-    const isChallenger = userSnap.data().isChallenger || false
-    const newTier = calculateTier(newPoints, isChallenger)
-
-    await updateDoc(userRef, {
-      points: newPoints,
-      tier: newTier,
-    })
+export async function addComment(postId: string, content: string): Promise<Comment> {
+  const response = await addCommentCallable({ postId, content })
+  return {
+    ...response.data.comment,
+    createdAt: new Date(response.data.comment.createdAt),
   }
 }
 
-export async function getUserPosts(userId: string): Promise<Post[]> {
-  const q = query(
-    collection(db, POSTS_COLLECTION),
-    where('authorId', '==', userId),
-    orderBy('createdAt', 'desc')
-  )
+export async function deleteComment(postId: string, commentId: string): Promise<void> {
+  await deleteCommentCallable({ postId, commentId })
+}
 
-  const snapshot = await getDocs(q)
+export async function getUserPosts(
+  userId: string,
+  pageSize = 30,
+  cursor?: QueryDocumentSnapshot<DocumentData> | null,
+): Promise<PaginatedPosts> {
+  const constraints: QueryConstraint[] = [where('authorId', '==', userId), orderBy('createdAt', 'desc'), limit(pageSize)]
+  if (cursor) {
+    constraints.push(startAfter(cursor))
+  }
 
-  return snapshot.docs.map((doc) => {
-    const data = doc.data()
-    return {
-      id: doc.id,
-      ...data,
-      createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
-      updatedAt: (data.updatedAt as Timestamp)?.toDate() || new Date(),
-    } as Post
-  })
+  const snapshot = await getDocs(query(collection(db, POSTS_COLLECTION), ...constraints))
+  const posts = snapshot.docs.map((item) => parsePost(item.id, item.data()))
+  const nextCursor = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null
+
+  return { posts, cursor: nextCursor }
 }

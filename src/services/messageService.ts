@@ -86,11 +86,15 @@ export async function getMessage(messageId: string): Promise<Message | null> {
 
 export async function markAsRead(messageId: string): Promise<void> {
   const docRef = doc(db, MESSAGES_COLLECTION, messageId)
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) return
   await updateDoc(docRef, { isRead: true })
 }
 
 export async function deleteMessage(messageId: string): Promise<void> {
   const docRef = doc(db, MESSAGES_COLLECTION, messageId)
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) return
   await deleteDoc(docRef)
 }
 

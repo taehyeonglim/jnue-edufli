@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, getDocs, doc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { useAuth, calculateTier } from '../contexts/AuthContext'
 import { User, Reward, TIER_INFO } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { Navigate } from 'react-router-dom'
+import { adminAdjustPoints, adminSetRole } from '../services/adminService'
 
 type Tab = 'users' | 'rewards' | 'challenger'
 
@@ -162,7 +163,8 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
     }
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
+      await adminSetRole({
+        targetUid: user.uid,
         isAdmin: !user.isAdmin,
       })
       onUpdate()
@@ -182,12 +184,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
     }
 
     try {
-      const newPoints = Math.max(0, user.points + points)
-      const newTier = calculateTier(newPoints, user.isChallenger || false)
-      await updateDoc(doc(db, 'users', user.uid), {
-        points: newPoints,
-        tier: newTier,
-      })
+      await adminAdjustPoints(user.uid, points)
       onUpdate()
     } catch (error) {
       console.error('포인트 조정 실패:', error)
@@ -228,7 +225,8 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
     }
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
+      await adminSetRole({
+        targetUid: user.uid,
         isTestAccount: !user.isTestAccount,
       })
       onUpdate()
@@ -392,9 +390,9 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
     }
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
+      await adminSetRole({
+        targetUid: user.uid,
         isChallenger: !user.isChallenger,
-        tier: user.isChallenger ? calculateTier(user.points, false) : 'challenger',
       })
       onUpdate()
     } catch (error) {
