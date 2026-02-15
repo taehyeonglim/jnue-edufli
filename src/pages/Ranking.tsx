@@ -5,6 +5,7 @@ import { User, TIER_INFO, TIER_THRESHOLDS, TierType } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import SendMessageModal from '../components/common/SendMessageModal'
 import { useAuth } from '../contexts/AuthContext'
+import { getNextTier } from '../utils/helpers'
 
 export default function Ranking() {
   const { currentUser } = useAuth()
@@ -41,19 +42,6 @@ export default function Ranking() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const getNextTier = (tier: TierType, points: number): { tier: TierType; pointsNeeded: number } | null => {
-    if (tier === 'challenger' || tier === 'master') return null
-
-    const tierOrder: TierType[] = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master']
-    const currentIndex = tierOrder.indexOf(tier)
-    if (currentIndex === -1 || currentIndex >= tierOrder.length - 1) return null
-
-    const nextTier = tierOrder[currentIndex + 1]
-    const pointsNeeded = TIER_THRESHOLDS[nextTier].min - points
-
-    return { tier: nextTier, pointsNeeded }
   }
 
   if (loading) {

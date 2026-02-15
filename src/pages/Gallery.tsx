@@ -72,7 +72,7 @@ export default function Gallery() {
       return
     }
 
-    if (!confirm('이 사진을 삭제하시겠습니까?')) return
+    if (!window.confirm('이 사진을 삭제하시겠습니까?')) return
 
     try {
       await deleteGalleryImage(image.id, image.imageURL)

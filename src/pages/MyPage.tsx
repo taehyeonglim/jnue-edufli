@@ -5,8 +5,9 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from '../config/firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { getUserPosts } from '../services/postService'
-import { Post, TIER_INFO, TIER_THRESHOLDS, TierType, INTEREST_OPTIONS, SKILL_OPTIONS, CATEGORY_INFO, CategoryType } from '../types'
+import { Post, TIER_INFO, TIER_THRESHOLDS, INTEREST_OPTIONS, SKILL_OPTIONS } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import { getNextTier, getCategoryLabel } from '../utils/helpers'
 
 export default function MyPage() {
   const { currentUser, refreshUser } = useAuth()
@@ -126,26 +127,6 @@ export default function MyPage() {
     )
   }
 
-  const getNextTier = (): { tier: TierType; pointsNeeded: number } | null => {
-    if (!currentUser) return null
-    const { tier, points } = currentUser
-
-    if (tier === 'challenger' || tier === 'master') return null
-
-    const tierOrder: TierType[] = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master']
-    const currentIndex = tierOrder.indexOf(tier)
-    if (currentIndex === -1 || currentIndex >= tierOrder.length - 1) return null
-
-    const nextTier = tierOrder[currentIndex + 1]
-    const pointsNeeded = TIER_THRESHOLDS[nextTier].min - points
-
-    return { tier: nextTier, pointsNeeded }
-  }
-
-  const getCategoryLabel = (category: CategoryType) => {
-    return CATEGORY_INFO[category]?.name || category
-  }
-
   if (!currentUser) {
     return (
       <div className="section">
@@ -166,7 +147,7 @@ export default function MyPage() {
     return <LoadingSpinner />
   }
 
-  const nextTierInfo = getNextTier()
+  const nextTierInfo = getNextTier(currentUser.tier, currentUser.points)
   const displayNickname = currentUser.nickname || currentUser.displayName
   const tierInfo = TIER_INFO[currentUser.tier] || TIER_INFO.bronze
 

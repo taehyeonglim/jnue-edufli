@@ -135,8 +135,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user)
       if (user) {
-        const userData = await fetchUserData(user)
-        setCurrentUser(userData)
+        try {
+          const userData = await fetchUserData(user)
+          setCurrentUser(userData)
+        } catch (error) {
+          console.error('사용자 데이터 로딩 실패:', error)
+          setCurrentUser(null)
+        }
       } else {
         setCurrentUser(null)
       }

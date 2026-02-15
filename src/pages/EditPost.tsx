@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { getPost, updatePost, uploadPostImage } from '../services/postService'
 import { Post } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import { getCategoryRoute } from '../utils/helpers'
 
 export default function EditPost() {
   const { id } = useParams<{ id: string }>()
@@ -54,7 +55,10 @@ export default function EditPost() {
       return false
     }
     setImageFile(file)
-    setImagePreview(URL.createObjectURL(file))
+    setImagePreview((prev) => {
+      if (prev && prev.startsWith('blob:')) URL.revokeObjectURL(prev)
+      return URL.createObjectURL(file)
+    })
     setRemoveImage(false)
     setError('')
     return true
@@ -85,7 +89,10 @@ export default function EditPost() {
 
   const handleRemoveImage = () => {
     setImageFile(null)
-    setImagePreview(null)
+    setImagePreview((prev) => {
+      if (prev && prev.startsWith('blob:')) URL.revokeObjectURL(prev)
+      return null
+    })
     setRemoveImage(true)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -127,20 +134,6 @@ export default function EditPost() {
     }
   }
 
-  const getCategoryInfo = (category: Post['category']) => {
-    switch (category) {
-      case 'introduction':
-        return { label: '자기소개', icon: '👋', link: '/introduction' }
-      case 'study':
-        return { label: '스터디/세미나', icon: '📖', link: '/study' }
-      case 'project':
-        return { label: '프로젝트', icon: '🚀', link: '/project' }
-      case 'resources':
-        return { label: '자료실', icon: '📁', link: '/resources' }
-      default:
-        return { label: '스터디/세미나', icon: '📖', link: '/study' }
-    }
-  }
 
   if (loading) {
     return <LoadingSpinner />
@@ -178,7 +171,7 @@ export default function EditPost() {
     )
   }
 
-  const categoryInfo = getCategoryInfo(post.category)
+  const categoryInfo = getCategoryRoute(post.category)
 
   return (
     <div className="section">

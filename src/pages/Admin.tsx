@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../config/firebase'
-import { useAuth } from '../contexts/AuthContext'
-import { User, Reward, TIER_INFO, TierType, TIER_THRESHOLDS } from '../types'
+import { useAuth, calculateTier } from '../contexts/AuthContext'
+import { User, Reward, TIER_INFO } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { Navigate } from 'react-router-dom'
 
@@ -24,15 +24,6 @@ export default function Admin() {
   useEffect(() => {
     loadData()
   }, [])
-
-  const calculateTier = (points: number, isChallenger: boolean): TierType => {
-    if (isChallenger) return 'challenger'
-    const tiers: TierType[] = ['master', 'diamond', 'platinum', 'gold', 'silver', 'bronze']
-    for (const tier of tiers) {
-      if (points >= TIER_THRESHOLDS[tier].min) return tier
-    }
-    return 'bronze'
-  }
 
   const loadData = async () => {
     try {
@@ -191,8 +182,11 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
     }
 
     try {
+      const newPoints = Math.max(0, user.points + points)
+      const newTier = calculateTier(newPoints, user.isChallenger || false)
       await updateDoc(doc(db, 'users', user.uid), {
-        points: Math.max(0, user.points + points),
+        points: newPoints,
+        tier: newTier,
       })
       onUpdate()
     } catch (error) {
@@ -275,7 +269,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
           <span className="w-56 text-right">액션</span>
         </div>
 
-        <div className="divide-y divide-[#1E2328]">
+        <div className="divide-y divide-gray-200">
           {filteredUsers.map((user) => {
             const tierInfo = TIER_INFO[user.tier]
             return (
@@ -400,7 +394,7 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
     try {
       await updateDoc(doc(db, 'users', user.uid), {
         isChallenger: !user.isChallenger,
-        tier: user.isChallenger ? 'master' : 'challenger',
+        tier: user.isChallenger ? calculateTier(user.points, false) : 'challenger',
       })
       onUpdate()
     } catch (error) {
@@ -468,7 +462,7 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
           </p>
         </div>
 
-        <div className="divide-y divide-[#1E2328]">
+        <div className="divide-y divide-gray-200">
           {nonChallengers.slice(0, 20).map((user, index) => {
             const tierInfo = TIER_INFO[user.tier]
             return (
@@ -642,7 +636,7 @@ function RewardsTab({
               <p className="text-gray-500">아직 지급 내역이 없습니다</p>
             </div>
           ) : (
-            <div className="divide-y divide-[#1E2328]">
+            <div className="divide-y divide-gray-200">
               {rewards.map((reward) => (
                 <div key={reward.id} className="p-4 hover:bg-gray-50 transition-colors">
                   <div className="flex items-start gap-3">

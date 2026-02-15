@@ -80,7 +80,10 @@ export default function WritePost() {
       return false
     }
     setImageFile(file)
-    setImagePreview(URL.createObjectURL(file))
+    setImagePreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev)
+      return URL.createObjectURL(file)
+    })
     setError('')
     return true
   }
@@ -109,6 +112,7 @@ export default function WritePost() {
   }
 
   const handleRemoveImage = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview)
     setImageFile(null)
     setImagePreview(null)
     if (fileInputRef.current) {

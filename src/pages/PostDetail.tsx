@@ -6,6 +6,7 @@ import { getUserById } from '../services/messageService'
 import { Post, Comment, User, POINT_VALUES, TIER_INFO } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import SendMessageModal from '../components/common/SendMessageModal'
+import { getCategoryRoute } from '../utils/helpers'
 
 export default function PostDetail() {
   const { id } = useParams<{ id: string }>()
@@ -114,20 +115,6 @@ export default function PostDetail() {
     }
   }
 
-  const getCategoryInfo = (category: Post['category']) => {
-    switch (category) {
-      case 'introduction':
-        return { label: '자기소개', link: '/introduction', icon: '👋' }
-      case 'study':
-        return { label: '스터디/세미나', link: '/study', icon: '📖' }
-      case 'project':
-        return { label: '프로젝트', link: '/project', icon: '🚀' }
-      case 'resources':
-        return { label: '자료실', link: '/resources', icon: '📁' }
-      default:
-        return { label: '', link: '/', icon: '' }
-    }
-  }
 
   if (loading) {
     return <LoadingSpinner />
@@ -149,7 +136,7 @@ export default function PostDetail() {
     )
   }
 
-  const categoryInfo = getCategoryInfo(post.category)
+  const categoryInfo = getCategoryRoute(post.category)
   const isAuthor = currentUser?.uid === post.authorId
   const isAdmin = currentUser?.isAdmin
   const isLiked = currentUser && post.likes.includes(currentUser.uid)

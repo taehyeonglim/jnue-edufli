@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
-import { useAuth } from '../../contexts/AuthContext'
-import { TierType, TIER_THRESHOLDS, TIER_INFO } from '../../types'
+import { useAuth, calculateTier } from '../../contexts/AuthContext'
+import { TierType, TIER_INFO } from '../../types'
 
 interface OnlineUser {
   uid: string
@@ -17,15 +17,6 @@ export default function OnlineUsers() {
   const { currentUser } = useAuth()
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([])
   const [isExpanded, setIsExpanded] = useState(false)
-
-  const calculateTier = (points: number, isChallenger: boolean): TierType => {
-    if (isChallenger) return 'challenger'
-    const tiers: TierType[] = ['master', 'diamond', 'platinum', 'gold', 'silver', 'bronze']
-    for (const tier of tiers) {
-      if (points >= TIER_THRESHOLDS[tier].min) return tier
-    }
-    return 'bronze'
-  }
 
   useEffect(() => {
     if (!currentUser) return

@@ -6,6 +6,9 @@ import {
   deleteDoc,
   getDoc,
   getDocs,
+  query,
+  where,
+  orderBy,
   serverTimestamp,
   arrayUnion,
   arrayRemove,
@@ -74,24 +77,18 @@ export async function createPost(
 }
 
 export async function getPosts(category?: Post['category']): Promise<Post[]> {
-  const snapshot = await getDocs(collection(db, POSTS_COLLECTION))
+  const q = category
+    ? query(collection(db, POSTS_COLLECTION), where('category', '==', category), orderBy('createdAt', 'desc'))
+    : query(collection(db, POSTS_COLLECTION), orderBy('createdAt', 'desc'))
 
-  let posts = snapshot.docs.map((doc) => ({
+  const snapshot = await getDocs(q)
+
+  return snapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
     createdAt: (doc.data().createdAt as Timestamp)?.toDate() || new Date(),
     updatedAt: (doc.data().updatedAt as Timestamp)?.toDate() || new Date(),
   })) as Post[]
-
-  // 카테고리 필터링
-  if (category) {
-    posts = posts.filter((post) => post.category === category)
-  }
-
-  // 최신순 정렬
-  posts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-
-  return posts
 }
 
 export async function getPost(postId: string): Promise<Post | null> {
@@ -200,12 +197,14 @@ export async function addComment(
 
 export async function deleteComment(postId: string, comment: Comment): Promise<void> {
   const docRef = doc(db, POSTS_COLLECTION, postId)
-  await updateDoc(docRef, {
-    comments: arrayRemove({
-      ...comment,
-      createdAt: Timestamp.fromDate(new Date(comment.createdAt)),
-    }),
-  })
+  const docSnap = await getDoc(docRef)
+
+  if (!docSnap.exists()) return
+
+  const comments = docSnap.data().comments || []
+  const updatedComments = comments.filter((c: Record<string, unknown>) => c.id !== comment.id)
+
+  await updateDoc(docRef, { comments: updatedComments })
 
   // 댓글 작성자 포인트 회수
   await addPoints(comment.authorId, -POINT_VALUES.COMMENT)
@@ -229,20 +228,21 @@ export async function addPoints(userId: string, points: number): Promise<void> {
 }
 
 export async function getUserPosts(userId: string): Promise<Post[]> {
-  const snapshot = await getDocs(collection(db, POSTS_COLLECTION))
+  const q = query(
+    collection(db, POSTS_COLLECTION),
+    where('authorId', '==', userId),
+    orderBy('createdAt', 'desc')
+  )
 
-  const posts = snapshot.docs
-    .map((doc) => {
-      const data = doc.data()
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
-        updatedAt: (data.updatedAt as Timestamp)?.toDate() || new Date(),
-      } as Post
-    })
-    .filter((post) => post.authorId === userId)
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  const snapshot = await getDocs(q)
 
-  return posts
+  return snapshot.docs.map((doc) => {
+    const data = doc.data()
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
+      updatedAt: (data.updatedAt as Timestamp)?.toDate() || new Date(),
+    } as Post
+  })
 }
