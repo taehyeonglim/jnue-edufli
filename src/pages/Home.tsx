@@ -422,7 +422,7 @@ function MemberCard({ member, rank, isAdmin }: { member: User; rank: number; isA
               style={{ background: `linear-gradient(135deg, ${tierInfo.color}60, ${tierInfo.color}20)` }}
             />
             <img
-              src={member.photoURL || '/default-avatar.png'}
+              src={member.photoURL || '/default-avatar.svg'}
               alt={displayName}
               className="relative w-16 h-16 rounded-full border-2 object-cover shadow-md"
               style={{ borderColor: tierInfo.color }}

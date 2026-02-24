@@ -15,7 +15,7 @@ export default function PostItem({ post, isLast }: PostItemProps) {
       className={`list-item gap-4 ${!isLast ? '' : 'border-b-0'}`}
     >
       <img
-        src={post.authorPhotoURL || '/default-avatar.png'}
+        src={post.authorPhotoURL || '/default-avatar.svg'}
         alt={post.authorName}
         className="avatar avatar-md"
         style={{ borderColor: tierInfo.color }}

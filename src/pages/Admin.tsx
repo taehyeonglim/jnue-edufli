@@ -275,7 +275,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
                 <div className="sm:grid sm:grid-cols-[1fr_auto_auto_auto_auto_auto] sm:gap-4 sm:items-center">
                   <div className="flex items-center gap-3 mb-3 sm:mb-0">
                     <img
-                      src={user.photoURL || '/default-avatar.png'}
+                      src={user.photoURL || '/default-avatar.svg'}
                       alt={user.displayName}
                       className="avatar avatar-md"
                       style={{ borderColor: tierInfo.color }}
@@ -429,7 +429,7 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
                   className="flex items-center gap-3 p-3 bg-gradient-to-r from-amber-50 to-transparent border border-amber-300 rounded"
                 >
                   <img
-                    src={user.photoURL || '/default-avatar.png'}
+                    src={user.photoURL || '/default-avatar.svg'}
                     alt={user.displayName}
                     className="avatar avatar-lg"
                     style={{ borderColor: TIER_INFO.challenger.color }}
@@ -472,7 +472,7 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
                   {index + 1}
                 </span>
                 <img
-                  src={user.photoURL || '/default-avatar.png'}
+                  src={user.photoURL || '/default-avatar.svg'}
                   alt={user.displayName}
                   className="avatar avatar-md"
                   style={{ borderColor: tierInfo.color }}

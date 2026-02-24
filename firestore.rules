@@ -15,29 +15,77 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
+    function isOwnerOrAdmin(uid) {
+      return isOwner(uid) || isAdmin();
+    }
+
+    function isSafeUserCreate(userId) {
+      return request.resource.data.uid == userId
+        && request.resource.data.keys().hasOnly([
+          'uid',
+          'email',
+          'displayName',
+          'nickname',
+          'photoURL',
+          'points',
+          'tier',
+          'isAdmin',
+          'isChallenger',
+          'introduction',
+          'department',
+          'year',
+          'interests',
+          'skills',
+          'createdAt'
+        ])
+        && request.resource.data.email is string
+        && request.resource.data.displayName is string
+        && request.resource.data.points == 0
+        && request.resource.data.tier == 'bronze'
+        && request.resource.data.isAdmin == false
+        && request.resource.data.isChallenger == false
+        && (
+          !request.resource.data.keys().hasAny(['isTestAccount']) ||
+          request.resource.data.isTestAccount == false
+        );
+    }
+
     function userFieldsUnchanged() {
       return request.resource.data.isAdmin == resource.data.isAdmin
         && request.resource.data.isChallenger == resource.data.isChallenger
         && request.resource.data.points == resource.data.points
-        && request.resource.data.tier == resource.data.tier;
+        && request.resource.data.tier == resource.data.tier
+        && request.resource.data.isTestAccount == resource.data.isTestAccount;
+    }
+
+    function isSafeUserProfileUpdate() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly([
+        'displayName',
+        'nickname',
+        'photoURL',
+        'introduction',
+        'department',
+        'year',
+        'interests',
+        'skills'
+      ]);
     }
 
     match /users/{userId} {
       allow read: if isSignedIn();
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) && userFieldsUnchanged();
+      allow create: if isOwner(userId) && isSafeUserCreate(userId);
+      allow update: if isOwner(userId) && userFieldsUnchanged() && isSafeUserProfileUpdate();
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
 
+    match /userPrivate/{userId} {
+      allow read, create, update, delete: if isOwnerOrAdmin(userId);
+    }
+
     match /posts/{postId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow update: if isSignedIn() &&
-        (resource.data.authorId == request.auth.uid || isAdmin()) &&
-        request.resource.data.authorId == resource.data.authorId;
-      allow delete: if isSignedIn() &&
-        (resource.data.authorId == request.auth.uid || isAdmin());
+      allow create, update, delete: if false;
     }
 
     match /messages/{messageId} {
@@ -46,8 +94,8 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.resource.data.senderId == request.auth.uid;
       allow update: if isSignedIn() &&
         resource.data.receiverId == request.auth.uid &&
-        request.resource.data.senderId == resource.data.senderId &&
-        request.resource.data.receiverId == resource.data.receiverId;
+        request.resource.data.diff(resource.data).changedKeys().hasOnly(['isRead']) &&
+        request.resource.data.isRead == true;
       allow delete: if isSignedIn() &&
         (resource.data.senderId == request.auth.uid || resource.data.receiverId == request.auth.uid || isAdmin());
     }

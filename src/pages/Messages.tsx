@@ -227,7 +227,7 @@ function MessageListItem({
     >
       <div className="flex items-start gap-3">
         <img
-          src={message.senderPhotoURL || '/default-avatar.png'}
+          src={message.senderPhotoURL || '/default-avatar.svg'}
           alt={message.senderName}
           className="avatar avatar-sm shrink-0"
           style={{ borderColor: tierInfo.color }}
@@ -285,7 +285,7 @@ function MessageDetail({
       {/* Header */}
       <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
         <img
-          src={message.senderPhotoURL || '/default-avatar.png'}
+          src={message.senderPhotoURL || '/default-avatar.svg'}
           alt={message.senderName}
           className="avatar avatar-md"
           style={{ borderColor: tierInfo.color }}

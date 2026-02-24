@@ -21,7 +21,8 @@ export const uploadGalleryImage = async (
   userName: string
 ): Promise<GalleryImage> => {
   // Upload image to storage
-  const storageRef = ref(storage, `gallery/${Date.now()}_${file.name}`)
+  const safeFileName = file.name.replace(/[\\/]/g, '_')
+  const storageRef = ref(storage, `gallery/${userId}/${Date.now()}_${safeFileName}`)
   await uploadBytes(storageRef, file)
   const imageURL = await getDownloadURL(storageRef)
 

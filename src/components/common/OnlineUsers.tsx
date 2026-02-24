@@ -128,7 +128,7 @@ export default function OnlineUsers() {
                     >
                       <div className="relative shrink-0">
                         <img
-                          src={user.photoURL || '/default-avatar.png'}
+                          src={user.photoURL || '/default-avatar.svg'}
                           alt={user.nickname || user.displayName}
                           className="w-8 h-8 rounded-full ring-1 ring-gray-200 object-cover"
                         />
@@ -167,7 +167,7 @@ export default function OnlineUsers() {
               {onlineUsers.slice(0, 4).map((user) => (
                 <img
                   key={user.uid}
-                  src={user.photoURL || '/default-avatar.png'}
+                  src={user.photoURL || '/default-avatar.svg'}
                   alt={user.nickname || user.displayName}
                   className="w-7 h-7 rounded-full ring-2 ring-white object-cover"
                   title={user.nickname || user.displayName}

@@ -171,7 +171,7 @@ export default function Header() {
                       style={{ background: `linear-gradient(135deg, ${TIER_INFO[currentUser.tier].color}40, ${TIER_INFO[currentUser.tier].color}20)` }}
                     />
                     <img
-                      src={currentUser.photoURL || '/default-avatar.png'}
+                      src={currentUser.photoURL || '/default-avatar.svg'}
                       alt={displayName}
                       className="relative w-9 h-9 rounded-full border-2 object-cover shadow-soft"
                       style={{ borderColor: TIER_INFO[currentUser.tier].color }}

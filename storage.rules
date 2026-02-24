@@ -16,9 +16,15 @@ service firebase.storage {
       allow write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
     }
 
+    match /gallery/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Legacy flat gallery path. Keep readable, but only admins can mutate.
     match /gallery/{fileName} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isAdmin();
     }
 
     match /profile-photos/{userId} {

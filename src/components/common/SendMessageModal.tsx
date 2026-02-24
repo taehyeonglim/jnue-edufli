@@ -89,7 +89,7 @@ export default function SendMessageModal({
           <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded border border-gray-200">
             <span className="text-sm text-gray-500">받는 사람:</span>
             <img
-              src={receiver.photoURL || '/default-avatar.png'}
+              src={receiver.photoURL || '/default-avatar.svg'}
               alt={receiver.nickname || receiver.displayName}
               className="avatar avatar-sm"
               style={{ borderColor: tierInfo.color }}

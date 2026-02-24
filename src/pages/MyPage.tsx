@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { doc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from '../config/firebase'
 import { useAuth } from '../contexts/AuthContext'
@@ -34,10 +34,14 @@ export default function MyPage() {
     if (!currentUser) return
     try {
       const { posts: userPosts } = await getUserPosts(currentUser.uid, 100)
+      const privateRef = doc(db, 'userPrivate', currentUser.uid)
+      const privateSnap = await getDoc(privateRef)
+      const privateData = privateSnap.exists() ? privateSnap.data() : {}
+
       setPosts(userPosts)
       setNickname(currentUser.nickname || currentUser.displayName || '')
-      setRealName(currentUser.realName || '')
-      setStudentId(currentUser.studentId || '')
+      setRealName(typeof privateData.realName === 'string' ? privateData.realName : currentUser.realName || '')
+      setStudentId(typeof privateData.studentId === 'string' ? privateData.studentId : currentUser.studentId || '')
       setInterests(currentUser.interests || [])
       setSkills(currentUser.skills || [])
     } catch (error) {
@@ -99,11 +103,21 @@ export default function MyPage() {
       const userRef = doc(db, 'users', currentUser.uid)
       await updateDoc(userRef, {
         nickname: nickname.trim(),
-        realName: realName.trim(),
-        studentId: studentId.trim(),
         interests,
         skills,
       })
+
+      const privateRef = doc(db, 'userPrivate', currentUser.uid)
+      await setDoc(
+        privateRef,
+        {
+          realName: realName.trim(),
+          studentId: studentId.trim(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      )
+
       await refreshUser()
       alert('저장되었습니다!')
     } catch (error) {
@@ -180,7 +194,7 @@ export default function MyPage() {
               {/* Avatar */}
               <div className="relative group shrink-0">
                 <img
-                  src={currentUser.photoURL || '/default-avatar.png'}
+                  src={currentUser.photoURL || '/default-avatar.svg'}
                   alt={displayNickname}
                   className="avatar avatar-xl"
                   style={{ borderColor: tierInfo.color }}

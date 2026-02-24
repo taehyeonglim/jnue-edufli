@@ -1,10 +1,12 @@
 import { initializeApp } from 'firebase-admin/app'
 import { getFirestore, Timestamp } from 'firebase-admin/firestore'
+import { getStorage } from 'firebase-admin/storage'
 import { HttpsError, onCall } from 'firebase-functions/v2/https'
 
 initializeApp()
 
 const db = getFirestore()
+const storageBucket = getStorage().bucket()
 const USERS_COLLECTION = 'users'
 const POSTS_COLLECTION = 'posts'
 const POINT_EVENTS_COLLECTION = 'pointEvents'
@@ -15,6 +17,7 @@ type CategoryType = 'introduction' | 'study' | 'project' | 'resources'
 const POINT_VALUES = {
   INTRODUCTION: 50,
   POST: 10,
+  RESOURCE_UPLOAD: 15,
   COMMENT: 3,
   LIKE_RECEIVED: 2,
 }
@@ -58,6 +61,61 @@ function asNonEmptyString(value: unknown, fieldName: string): string {
     throw new HttpsError('invalid-argument', `${fieldName}는 비어 있을 수 없습니다.`)
   }
   return trimmed
+}
+
+function asOptionalImageUrl(value: unknown, fieldName: string): string | null {
+  if (value === null || value === undefined) {
+    return null
+  }
+  if (typeof value !== 'string') {
+    throw new HttpsError('invalid-argument', `${fieldName}는 문자열 또는 null이어야 합니다.`)
+  }
+  const trimmed = value.trim()
+  return trimmed || null
+}
+
+function getPostPoints(category: CategoryType): number {
+  if (category === 'introduction') return POINT_VALUES.INTRODUCTION
+  if (category === 'resources') return POINT_VALUES.RESOURCE_UPLOAD
+  return POINT_VALUES.POST
+}
+
+function extractStorageObjectPath(imageURL: string): string | null {
+  const trimmed = imageURL.trim()
+  if (!trimmed) return null
+
+  if (trimmed.startsWith('posts/')) {
+    return trimmed
+  }
+
+  if (trimmed.startsWith('gs://')) {
+    const prefix = `gs://${storageBucket.name}/`
+    return trimmed.startsWith(prefix) ? trimmed.slice(prefix.length) : null
+  }
+
+  try {
+    const url = new URL(trimmed)
+    if (url.hostname !== 'firebasestorage.googleapis.com') return null
+    const match = url.pathname.match(/\/b\/([^/]+)\/o\/([^/].*)$/)
+    if (!match) return null
+    const bucketName = decodeURIComponent(match[1] || '')
+    if (bucketName !== storageBucket.name) return null
+    return decodeURIComponent(match[2] || '')
+  } catch {
+    return null
+  }
+}
+
+async function deletePostImageIfExists(imageURL: unknown): Promise<void> {
+  if (typeof imageURL !== 'string') return
+  const objectPath = extractStorageObjectPath(imageURL)
+  if (!objectPath || !objectPath.startsWith('posts/')) return
+
+  try {
+    await storageBucket.file(objectPath).delete({ ignoreNotFound: true })
+  } catch (error) {
+    console.error('게시글 이미지 정리 실패:', error)
+  }
 }
 
 async function applyPointDeltaTx(
@@ -128,12 +186,63 @@ export const createPost = onCall(async (request) => {
     updatedAt: Timestamp.now(),
   })
 
-  const points = category === 'introduction' ? POINT_VALUES.INTRODUCTION : POINT_VALUES.POST
+  const points = getPostPoints(category)
   await db.runTransaction(async (tx) => {
     await applyPointDeltaTx(tx, uid, points, `post:create:${createdPostRef.id}`)
   })
 
   return { postId: createdPostRef.id }
+})
+
+export const updatePost = onCall(async (request) => {
+  const uid = request.auth?.uid
+  if (!uid) throw new HttpsError('unauthenticated', '로그인이 필요합니다.')
+
+  const postId = asNonEmptyString(request.data?.postId, 'postId')
+  const title = asNonEmptyString(request.data?.title, 'title')
+  const content = asNonEmptyString(request.data?.content, 'content')
+  const hasImageURLField = Object.prototype.hasOwnProperty.call(request.data || {}, 'imageURL')
+  const nextImageURL = hasImageURLField ? asOptionalImageUrl(request.data?.imageURL, 'imageURL') : undefined
+
+  const { userSnap: actorSnap } = await getUserOrThrow(uid)
+  const isAdmin = actorSnap.data()?.isAdmin === true
+  const postRef = db.collection(POSTS_COLLECTION).doc(postId)
+  let previousImageURL: string | null = null
+
+  await db.runTransaction(async (tx) => {
+    const postSnap = await tx.get(postRef)
+    if (!postSnap.exists) {
+      throw new HttpsError('not-found', '게시글을 찾을 수 없습니다.')
+    }
+
+    const post = postSnap.data() || {}
+    const canEdit = isAdmin || post.authorId === uid
+    if (!canEdit) {
+      throw new HttpsError('permission-denied', '게시글 수정 권한이 없습니다.')
+    }
+
+    previousImageURL = typeof post.imageURL === 'string' ? post.imageURL : null
+    const updates: Record<string, unknown> = {
+      title,
+      content,
+      updatedAt: Timestamp.now(),
+    }
+    if (nextImageURL !== undefined) {
+      updates.imageURL = nextImageURL
+    }
+
+    tx.update(postRef, updates)
+  })
+
+  if (
+    hasImageURLField &&
+    previousImageURL &&
+    previousImageURL !== nextImageURL
+  ) {
+    await deletePostImageIfExists(previousImageURL)
+  }
+
+  return { success: true }
 })
 
 export const togglePostLike = onCall(async (request) => {
@@ -279,6 +388,7 @@ export const deletePost = onCall(async (request) => {
   const postRef = db.collection(POSTS_COLLECTION).doc(postId)
   const { userSnap: actorSnap } = await getUserOrThrow(uid)
   const isAdmin = actorSnap.data()?.isAdmin === true
+  let imageURLToDelete: string | null = null
 
   await db.runTransaction(async (tx) => {
     const postSnap = await tx.get(postRef)
@@ -293,13 +403,18 @@ export const deletePost = onCall(async (request) => {
 
     const category = post.category as CategoryType
     const authorId = post.authorId as string
-    const points = category === 'introduction' ? POINT_VALUES.INTRODUCTION : POINT_VALUES.POST
+    const points = getPostPoints(category)
+    imageURLToDelete = typeof post.imageURL === 'string' ? post.imageURL : null
     tx.delete(postRef)
 
     if (authorId) {
       await applyPointDeltaTx(tx, authorId, -points, `post:delete:${postId}`)
     }
   })
+
+  if (imageURLToDelete) {
+    await deletePostImageIfExists(imageURLToDelete)
+  }
 
   return { success: true }
 })

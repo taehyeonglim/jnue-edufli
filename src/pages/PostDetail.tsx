@@ -164,7 +164,7 @@ export default function PostDetail() {
             <div className="flex items-start justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <img
-                  src={post.authorPhotoURL || '/default-avatar.png'}
+                  src={post.authorPhotoURL || '/default-avatar.svg'}
                   alt={post.authorName}
                   className="avatar avatar-md"
                   style={{ borderColor: tierInfo.color }}
@@ -344,7 +344,7 @@ function CommentItem({
   return (
     <div className="flex gap-3 p-4 bg-gray-50 rounded border border-gray-200">
       <img
-        src={comment.authorPhotoURL || '/default-avatar.png'}
+        src={comment.authorPhotoURL || '/default-avatar.svg'}
         alt={comment.authorName}
         className="avatar avatar-sm shrink-0"
         style={{ borderColor: tierInfo.color }}

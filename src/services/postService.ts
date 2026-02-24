@@ -8,7 +8,6 @@ import {
   query,
   startAfter,
   Timestamp,
-  updateDoc,
   where,
   QueryConstraint,
   QueryDocumentSnapshot,
@@ -40,6 +39,10 @@ const deleteCommentCallable = httpsCallable<{ postId: string; commentId: string 
   'deletePostComment',
 )
 const deletePostCallable = httpsCallable<{ postId: string }, { success: boolean }>(functions, 'deletePost')
+const updatePostCallable = httpsCallable<
+  { postId: string; title: string; content: string; imageURL?: string | null },
+  { success: boolean }
+>(functions, 'updatePost')
 
 export interface PaginatedPosts {
   posts: Post[]
@@ -132,18 +135,12 @@ export async function updatePost(
   content: string,
   imageURL?: string | null,
 ): Promise<void> {
-  const docRef = doc(db, POSTS_COLLECTION, postId)
-  const updateData: Record<string, unknown> = {
+  await updatePostCallable({
+    postId,
     title,
     content,
-    updatedAt: Timestamp.now(),
-  }
-
-  if (imageURL !== undefined) {
-    updateData.imageURL = imageURL
-  }
-
-  await updateDoc(docRef, updateData)
+    imageURL,
+  })
 }
 
 export async function deletePost(postId: string): Promise<void> {

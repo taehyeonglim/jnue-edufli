@@ -70,7 +70,7 @@ export default function Ranking() {
               <div className="flex items-center gap-4">
                 <div className="relative shrink-0">
                   <img
-                    src={currentUser.photoURL || '/default-avatar.png'}
+                    src={currentUser.photoURL || '/default-avatar.svg'}
                     alt={currentUser.displayName}
                     className="avatar avatar-lg"
                     style={{ borderColor: TIER_INFO[currentUser.tier].color }}
@@ -258,7 +258,7 @@ function RankingRow({
 
       <div className="flex items-center gap-3 min-w-0">
         <img
-          src={user.photoURL || '/default-avatar.png'}
+          src={user.photoURL || '/default-avatar.svg'}
           alt={displayName}
           className="avatar avatar-sm"
           style={{ borderColor: tierInfo.color }}
