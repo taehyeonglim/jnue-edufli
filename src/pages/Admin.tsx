@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, doc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { useAuth, calculateTier } from '../contexts/AuthContext'
 import { User, Reward, TIER_INFO } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import { Navigate } from 'react-router-dom'
-import { adminAdjustPoints, adminSetRole } from '../services/adminService'
+import { adminAdjustPoints, adminSetRole, adminDeleteUser } from '../services/adminService'
 
 type Tab = 'users' | 'rewards' | 'challenger'
 
@@ -209,7 +209,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
     }
 
     try {
-      await deleteDoc(doc(db, 'users', user.uid))
+      await adminDeleteUser(user.uid)
       alert(`${user.nickname || user.displayName} 회원이 삭제되었습니다.`)
       onUpdate()
     } catch (error) {

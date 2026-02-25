@@ -27,3 +27,12 @@ export async function adminSetRole(payload: {
 }): Promise<void> {
   await adminSetRoleCallable(payload)
 }
+
+const adminDeleteUserCallable = httpsCallable<
+  { targetUid: string },
+  { success: boolean }
+>(functions, 'adminDeleteUser')
+
+export async function adminDeleteUser(targetUid: string): Promise<void> {
+  await adminDeleteUserCallable({ targetUid })
+}

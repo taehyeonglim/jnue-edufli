@@ -489,3 +489,32 @@ export const adminSetRole = onCall(async (request) => {
   await targetRef.update(updates)
   return { success: true }
 })
+
+export const adminDeleteUser = onCall(async (request) => {
+  const actorUid = request.auth?.uid
+  if (!actorUid) throw new HttpsError('unauthenticated', '로그인이 필요합니다.')
+
+  const { userSnap: actorSnap } = await getUserOrThrow(actorUid)
+  if (actorSnap.data()?.isAdmin !== true) {
+    throw new HttpsError('permission-denied', '관리자 권한이 필요합니다.')
+  }
+
+  const targetUid = asNonEmptyString(request.data?.targetUid, 'targetUid')
+  if (targetUid === actorUid) {
+    throw new HttpsError('failed-precondition', '본인 계정은 삭제할 수 없습니다.')
+  }
+
+  const targetRef = db.collection(USERS_COLLECTION).doc(targetUid)
+  const targetSnap = await targetRef.get()
+  if (!targetSnap.exists) {
+    throw new HttpsError('not-found', '대상 사용자를 찾을 수 없습니다.')
+  }
+
+  const target = targetSnap.data() || {}
+  if (target.isAdmin === true) {
+    throw new HttpsError('failed-precondition', '관리자는 삭제할 수 없습니다.')
+  }
+
+  await targetRef.delete()
+  return { success: true }
+})
