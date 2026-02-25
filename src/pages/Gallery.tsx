@@ -188,7 +188,7 @@ export default function Gallery() {
       {showUploadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl">
-            <div className="flex items-center justify-between border-b border-gray-200" style={{ padding: '1.5rem' }}>
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">사진 업로드</h3>
               <button
                 onClick={closeUploadModal}
@@ -200,7 +200,7 @@ export default function Gallery() {
               </button>
             </div>
 
-            <div className="space-y-5" style={{ padding: '1.5rem' }}>
+            <div className="space-y-5 p-6">
               {/* File Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">사진 선택</label>
@@ -262,7 +262,7 @@ export default function Gallery() {
               </div>
             </div>
 
-            <div className="flex gap-3 border-t border-gray-200" style={{ padding: '1.5rem' }}>
+            <div className="flex gap-3 p-6 border-t border-gray-200">
               <button
                 onClick={closeUploadModal}
                 className="btn btn-secondary flex-1"

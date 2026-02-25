@@ -72,7 +72,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden" style={{ paddingTop: '3.5rem', paddingBottom: '3.5rem' }}>
+      <section className="relative overflow-hidden py-14">
         {/* Decorative Elements */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-float" />
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-accent-400/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '-3s' }} />
@@ -81,7 +81,7 @@ export default function Home() {
         <div className="container relative">
           <div className="text-center max-w-3xl mx-auto">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2.5 py-2.5 mb-10 bg-white/80 backdrop-blur-xl rounded-full border border-white/50 shadow-lg shadow-black/[0.03]" style={{ paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
+            <div className="inline-flex items-center gap-2.5 px-6 py-2.5 mb-10 bg-white/80 backdrop-blur-xl rounded-full border border-white/50 shadow-lg shadow-black/[0.03]">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent-500"></span>
@@ -132,7 +132,7 @@ export default function Home() {
         <section className="py-20 md:py-28">
           <div className="container">
             <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 mb-5 bg-accent-50 rounded-full" style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
+              <div className="inline-flex items-center gap-2 mb-5 px-5 py-2 bg-accent-50 rounded-full">
                 <span className="text-lg">👥</span>
                 <span className="text-sm font-medium text-accent-600">Members</span>
               </div>
@@ -169,15 +169,15 @@ export default function Home() {
       )}
 
       {/* Section Divider */}
-      <div className="container" style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
-        <div style={{ height: '1px', background: 'linear-gradient(to right, transparent, #e2e8f0, transparent)' }} />
+      <div className="container py-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
       </div>
 
       {/* Features Section */}
-      <section style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <section className="py-8">
         <div className="container-sm">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 mb-5 bg-primary-50 rounded-full" style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
+            <div className="inline-flex items-center gap-2 mb-5 px-5 py-2 bg-primary-50 rounded-full">
               <span className="text-lg">📋</span>
               <span className="text-sm font-medium text-primary-600">Boards</span>
             </div>
@@ -223,15 +223,15 @@ export default function Home() {
       </section>
 
       {/* Section Divider */}
-      <div className="container" style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
-        <div style={{ height: '1px', background: 'linear-gradient(to right, transparent, #e2e8f0, transparent)' }} />
+      <div className="container py-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
       </div>
 
       {/* Tier Section */}
-      <section style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <section className="py-8">
         <div className="container-sm">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 mb-5 bg-warm-light/30 rounded-full" style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem', paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
+            <div className="inline-flex items-center gap-2 mb-5 px-5 py-2 bg-warm-light/30 rounded-full">
               <span className="text-lg">🏅</span>
               <span className="text-sm font-medium text-amber-600">Growth System</span>
             </div>

@@ -177,8 +177,7 @@ export default function Ranking() {
           <div className="card overflow-hidden">
             {/* Header */}
             <div
-              className="grid grid-cols-[3rem_1fr_auto_6rem] gap-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200"
-              style={{ padding: '1.25rem 1.5rem' }}
+              className="grid grid-cols-[3rem_1fr_auto_6rem] gap-4 px-6 py-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200"
             >
               <span className="text-center">#</span>
               <span>유저</span>
@@ -247,10 +246,9 @@ function RankingRow({
 
   return (
     <div
-      className={`grid grid-cols-[3rem_1fr_auto_6rem] gap-4 items-center border-b border-gray-200 transition-colors ${
+      className={`grid grid-cols-[3rem_1fr_auto_6rem] gap-4 px-6 py-5 items-center border-b border-gray-200 transition-colors ${
         isCurrentUser ? 'bg-blue-50' : 'hover:bg-gray-50'
       }`}
-      style={{ padding: '1.25rem 1.5rem' }}
     >
       <span className={`text-center ${rankDisplay.className}`}>
         {rankDisplay.emoji}
