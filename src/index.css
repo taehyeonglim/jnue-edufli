@@ -332,7 +332,8 @@ p:last-child {
 }
 
 .btn-primary:active {
-  transform: translateY(0);
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 .btn-secondary {
@@ -469,9 +470,10 @@ p:last-child {
 }
 
 .badge-primary {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
-  color: #6366F1;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.12) 100%);
+  color: #4F46E5;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.15);
 }
 
 .badge-accent {
@@ -590,9 +592,12 @@ p:last-child {
 .page-title {
   font-size: 2.25rem;
   font-weight: 800;
-  color: var(--text-primary);
   margin-bottom: var(--space-3);
   letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--text-primary) 0%, #6366F1 60%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .page-desc {
@@ -619,7 +624,9 @@ p:last-child {
   display: flex;
   align-items: center;
   padding: var(--space-4) var(--space-5);
+  padding-left: calc(var(--space-5) - 3px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-left: 3px solid transparent;
   transition: all 0.2s ease;
 }
 
@@ -628,13 +635,21 @@ p:last-child {
 }
 
 .list-item:hover {
-  background: rgba(99, 102, 241, 0.03);
+  background: rgba(99, 102, 241, 0.05);
+  border-left-color: #6366F1;
 }
 
 /* ========== FLOATING ANIMATION ========== */
 .floating {
   animation: float 6s ease-in-out infinite;
 }
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.animate-pop { animation: pop 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); }
 
 
 /* ========== TAG CHIPS ========== */

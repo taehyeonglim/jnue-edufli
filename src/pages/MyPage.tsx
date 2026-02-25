@@ -150,7 +150,7 @@ export default function MyPage() {
         <div className="container-xs">
           <div className="card text-center py-16">
             <div className="text-5xl mb-4">🔒</div>
-            <p className="text-gray-500 mb-6">로그인이 필요합니다</p>
+            <p className="text-slate-500 mb-6">로그인이 필요합니다</p>
             <Link to="/" className="btn btn-primary">
               홈으로 가기
             </Link>
@@ -190,6 +190,11 @@ export default function MyPage() {
         <div className="container-sm">
           {/* Profile Header Card */}
           <div className="card p-6 mb-6">
+            {/* 티어 색상 배너 */}
+            <div
+              className="h-20 -mx-6 -mt-6 mb-5 rounded-t-2xl"
+              style={{ background: `linear-gradient(135deg, ${tierInfo.color}50, ${tierInfo.color}15)` }}
+            />
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
               {/* Avatar */}
               <div className="relative group shrink-0">
@@ -224,7 +229,7 @@ export default function MyPage() {
               {/* User Info */}
               <div className="flex-1 text-center sm:text-left min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                  <h1 className="text-xl font-bold text-gray-900">{displayNickname}</h1>
+                  <h1 className="text-xl font-bold text-slate-900">{displayNickname}</h1>
                   <div className="flex items-center justify-center sm:justify-start gap-2">
                     <span
                       className="text-xs font-medium px-2 py-0.5 rounded"
@@ -241,7 +246,7 @@ export default function MyPage() {
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-500 mb-3">{currentUser.email}</p>
+                <p className="text-sm text-slate-500 mb-3">{currentUser.email}</p>
 
                 {(currentUser.department || currentUser.year) && (
                   <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-3">
@@ -256,9 +261,9 @@ export default function MyPage() {
 
                 {/* Points & Progress */}
                 <div className="flex items-center justify-center sm:justify-start gap-3 mb-3">
-                  <span className="text-2xl font-bold text-blue-600">{currentUser.points}P</span>
+                  <span className="text-3xl font-black bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent">{currentUser.points}P</span>
                   {nextTierInfo && (
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-slate-500">
                       {TIER_INFO[nextTierInfo.tier].emoji} {nextTierInfo.pointsNeeded}P 남음
                     </span>
                   )}
@@ -270,11 +275,12 @@ export default function MyPage() {
                       <div
                         className="progress-fill"
                         style={{
-                          width: `${Math.min(
+                                  width: `${Math.min(
                             ((currentUser.points - TIER_THRESHOLDS[currentUser.tier].min) /
                               (TIER_THRESHOLDS[nextTierInfo.tier].min - TIER_THRESHOLDS[currentUser.tier].min)) * 100,
                             100
                           )}%`,
+                          background: `linear-gradient(90deg, ${TIER_INFO[currentUser.tier].color}, ${TIER_INFO[nextTierInfo.tier].color})`,
                         }}
                       />
                     </div>
@@ -323,7 +329,7 @@ export default function MyPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                    <label className="block text-sm font-medium text-slate-900 mb-2">
                       닉네임 <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -334,12 +340,12 @@ export default function MyPage() {
                       className="input"
                       maxLength={20}
                     />
-                    <p className="text-xs text-gray-500 mt-1.5">다른 회원들에게 보여지는 이름입니다.</p>
+                    <p className="text-xs text-slate-500 mt-1.5">다른 회원들에게 보여지는 이름입니다.</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
-                      실명 <span className="text-xs text-gray-500">(비공개)</span>
+                    <label className="block text-sm font-medium text-slate-900 mb-2">
+                      실명 <span className="text-xs text-slate-500">(비공개)</span>
                     </label>
                     <input
                       type="text"
@@ -349,12 +355,12 @@ export default function MyPage() {
                       className="input"
                       maxLength={20}
                     />
-                    <p className="text-xs text-gray-500 mt-1.5">본인과 관리자만 확인할 수 있습니다.</p>
+                    <p className="text-xs text-slate-500 mt-1.5">본인과 관리자만 확인할 수 있습니다.</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
-                      학번 <span className="text-xs text-gray-500">(비공개)</span>
+                    <label className="block text-sm font-medium text-slate-900 mb-2">
+                      학번 <span className="text-xs text-slate-500">(비공개)</span>
                     </label>
                     <input
                       type="text"
@@ -364,12 +370,12 @@ export default function MyPage() {
                       className="input"
                       maxLength={20}
                     />
-                    <p className="text-xs text-gray-500 mt-1.5">본인과 관리자만 확인할 수 있습니다.</p>
+                    <p className="text-xs text-slate-500 mt-1.5">본인과 관리자만 확인할 수 있습니다.</p>
                   </div>
 
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">관심 분야</label>
+                    <label className="block text-sm font-medium text-slate-900 mb-2">관심 분야</label>
                     <div className="flex flex-wrap gap-2">
                       {INTEREST_OPTIONS.map((interest) => (
                         <button
@@ -384,11 +390,11 @@ export default function MyPage() {
                         </button>
                       ))}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1.5">여러 개 선택 가능합니다.</p>
+                    <p className="text-xs text-slate-500 mt-1.5">여러 개 선택 가능합니다.</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">보유 기술</label>
+                    <label className="block text-sm font-medium text-slate-900 mb-2">보유 기술</label>
                     <div className="flex flex-wrap gap-2">
                       {SKILL_OPTIONS.map((skill) => (
                         <button
@@ -403,7 +409,7 @@ export default function MyPage() {
                         </button>
                       ))}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1.5">여러 개 선택 가능합니다.</p>
+                    <p className="text-xs text-slate-500 mt-1.5">여러 개 선택 가능합니다.</p>
                   </div>
 
                   <button
@@ -428,7 +434,7 @@ export default function MyPage() {
                 {posts.length === 0 ? (
                   <div className="text-center py-10">
                     <div className="text-4xl mb-3">📝</div>
-                    <p className="text-gray-500 mb-4">아직 작성한 글이 없습니다</p>
+                    <p className="text-slate-500 mb-4">아직 작성한 글이 없습니다</p>
                     <Link to="/write?category=introduction" className="btn btn-primary">
                       첫 글 작성하기
                     </Link>
@@ -439,13 +445,13 @@ export default function MyPage() {
                       <Link
                         key={post.id}
                         to={`/post/${post.id}`}
-                        className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+                        className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors"
                       >
                         <div className="min-w-0 flex-1">
                           <span className="text-xs text-teal-600 mr-2">[{getCategoryLabel(post.category)}]</span>
-                          <span className="text-sm text-gray-900">{post.title}</span>
+                          <span className="text-sm text-slate-900">{post.title}</span>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500 shrink-0">
+                        <div className="flex items-center gap-3 text-xs text-slate-500 shrink-0">
                           <span className="flex items-center gap-1">
                             <span className="text-red-400">♥</span>
                             <span>{post.likes.length}</span>
@@ -473,8 +479,8 @@ function StatCard({ label, value, icon }: { label: string; value: number; icon: 
   return (
     <div className="card p-4 text-center">
       <span className="text-xl mb-1 block">{icon}</span>
-      <p className="text-xl font-bold text-blue-600">{value}</p>
-      <p className="text-xs text-gray-500">{label}</p>
+      <p className="text-3xl font-black text-slate-800">{value}</p>
+      <p className="text-xs text-slate-500">{label}</p>
     </div>
   )
 }

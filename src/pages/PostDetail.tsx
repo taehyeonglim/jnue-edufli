@@ -173,9 +173,9 @@ export default function PostDetail() {
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="font-semibold text-gray-900">{post.authorName}</span>
                     <span
-                      className="text-xs font-medium px-1.5 py-0.5 rounded"
+                      className="text-xs font-semibold px-3 py-1 rounded-full"
                       style={{
-                        backgroundColor: `${tierInfo.color}20`,
+                        backgroundColor: `${tierInfo.color}25`,
                         color: tierInfo.color,
                       }}
                     >
@@ -229,14 +229,14 @@ export default function PostDetail() {
               <button
                 onClick={handleLike}
                 disabled={!currentUser || isAuthor}
-                className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 ${
                   isLiked
-                    ? 'bg-red-500/15 text-red-400 border border-red-400/30'
-                    : 'bg-gray-50 text-gray-500 border border-gray-200 hover:border-blue-400 hover:text-gray-900'
+                    ? 'bg-gradient-to-r from-red-400 to-pink-400 text-white shadow-lg shadow-red-400/30 scale-105'
+                    : 'bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-400'
                 }`}
               >
-                <span>{isLiked ? '❤️' : '🤍'}</span>
-                <span>좋아요 {post.likes.length}</span>
+                <span>❤️</span>
+                <span>{post.likes.length}</span>
               </button>
               <span className="text-sm text-gray-500">
                 💬 댓글 {post.comments.length}개
@@ -288,15 +288,15 @@ export default function PostDetail() {
                 </div>
               </form>
             ) : (
-              <div className="mb-6 p-4 bg-gray-50 rounded border border-gray-200 text-center">
-                <p className="text-sm text-gray-500">댓글을 작성하려면 로그인하세요</p>
+              <div className="mb-6 p-4 bg-slate-50 rounded border border-slate-200 text-center">
+                <p className="text-sm text-slate-500">댓글을 작성하려면 로그인하세요</p>
               </div>
             )}
 
             {/* Comments List */}
             {post.comments.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-sm text-gray-500">아직 댓글이 없습니다</p>
+                <p className="text-sm text-slate-500">아직 댓글이 없습니다</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -342,7 +342,7 @@ function CommentItem({
   const tierInfo = TIER_INFO[comment.authorTier] || TIER_INFO.bronze
 
   return (
-    <div className="flex gap-3 p-4 bg-gray-50 rounded border border-gray-200">
+    <div className="flex gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
       <img
         src={comment.authorPhotoURL || '/default-avatar.svg'}
         alt={comment.authorName}
@@ -355,7 +355,7 @@ function CommentItem({
           <span className="text-xs" style={{ color: tierInfo.color }}>
             {tierInfo.emoji}
           </span>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-slate-500">
             {createdAt.toLocaleString('ko-KR')}
           </span>
           {canDelete && (

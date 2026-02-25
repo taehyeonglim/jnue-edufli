@@ -162,7 +162,7 @@ export default function Ranking() {
               {(['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master'] as TierType[]).map((tier) => (
                 <div
                   key={tier}
-                  className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 rounded-lg border border-gray-200"
+                  className="flex items-center gap-2 px-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200"
                 >
                   <span className="text-base">{TIER_INFO[tier].emoji}</span>
                   <span className="text-sm font-medium" style={{ color: TIER_INFO[tier].color }}>
@@ -244,11 +244,19 @@ function RankingRow({
   const displayName = user.nickname || user.displayName
   const tierInfo = TIER_INFO[user.tier] || TIER_INFO.bronze
 
+  const rowClass = rank === 1
+    ? 'bg-gradient-to-r from-yellow-50/80 to-amber-50/50 border-l-4 border-l-yellow-400'
+    : rank === 2
+    ? 'bg-gradient-to-r from-slate-50/80 to-gray-50/50 border-l-4 border-l-slate-400'
+    : rank === 3
+    ? 'bg-gradient-to-r from-orange-50/80 to-amber-50/50 border-l-4 border-l-orange-400'
+    : isCurrentUser
+    ? 'bg-blue-50/80 border-l-4 border-l-blue-400'
+    : 'hover:bg-slate-50/80'
+
   return (
     <div
-      className={`grid grid-cols-[3rem_1fr_auto_6rem] gap-4 px-6 py-5 items-center border-b border-gray-200 transition-colors ${
-        isCurrentUser ? 'bg-blue-50' : 'hover:bg-gray-50'
-      }`}
+      className={`grid grid-cols-[3rem_1fr_auto_6rem] gap-4 px-6 py-5 items-center border-b border-gray-200 transition-colors ${rowClass}`}
     >
       <span className={`text-center ${rankDisplay.className}`}>
         {rankDisplay.emoji}
@@ -267,15 +275,22 @@ function RankingRow({
         </span>
       </div>
 
-      <div className="flex items-center gap-1">
-        <span className="text-sm">{tierInfo.emoji}</span>
-        <span className="text-xs font-medium" style={{ color: tierInfo.color }}>
-          {tierInfo.name}
+      <div className="flex items-center">
+        <span
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
+          style={{ backgroundColor: `${tierInfo.color}20`, color: tierInfo.color }}
+        >
+          {tierInfo.emoji} {tierInfo.name}
         </span>
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="font-bold text-blue-600">{user.points}P</span>
+        <span
+          className={`font-bold ${rank <= 3 ? 'text-lg' : ''}`}
+          style={rank <= 3 ? { color: tierInfo.color } : { color: '#2563EB' }}
+        >
+          {user.points}P
+        </span>
         {canMessage && (
           <button
             onClick={(e) => {

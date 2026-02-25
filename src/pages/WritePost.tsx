@@ -168,7 +168,7 @@ export default function WritePost() {
         <div className="container-xs">
           <div className="card text-center py-16">
             <div className="text-5xl mb-4">🔒</div>
-            <p className="text-gray-500 mb-6">로그인이 필요합니다</p>
+            <p className="text-slate-500 mb-6">로그인이 필요합니다</p>
             <Link to="/" className="btn btn-primary">
               홈으로 가기
             </Link>
@@ -182,7 +182,7 @@ export default function WritePost() {
     <div className="section">
       <div className="container-sm">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
           <Link to="/" className="hover:text-blue-600 transition-colors">홈</Link>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -204,7 +204,9 @@ export default function WritePost() {
               <span className="text-2xl">{categoryInfo.icon}</span>
               <h1 className="heading-3 text-blue-600">{categoryInfo.label}</h1>
             </div>
-            <span className="badge badge-primary">+{categoryInfo.points}P</span>
+            <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-sm font-bold rounded-full shadow-lg shadow-primary-500/30">
+              ✨ +{categoryInfo.points}P
+            </span>
           </div>
 
           <div className="card-body">
@@ -219,7 +221,7 @@ export default function WritePost() {
 
             <form onSubmit={handleSubmit}>
               <div className="mb-5">
-                <label htmlFor="title" className="block text-sm font-medium text-gray-900 mb-2">
+                <label htmlFor="title" className="block text-sm font-medium text-slate-900 mb-2">
                   제목
                 </label>
                 <input
@@ -234,7 +236,7 @@ export default function WritePost() {
               </div>
 
               <div className="mb-6">
-                <label htmlFor="content" className="block text-sm font-medium text-gray-900 mb-2">
+                <label htmlFor="content" className="block text-sm font-medium text-slate-900 mb-2">
                   내용
                 </label>
                 <textarea
@@ -247,15 +249,15 @@ export default function WritePost() {
                   maxLength={5000}
                 />
                 <div className="flex justify-between mt-2">
-                  <span className="text-xs text-gray-400">Ctrl+V로 이미지 붙여넣기 가능</span>
-                  <span className="text-xs text-gray-500">{content.length} / 5000</span>
+                  <span className="text-xs text-slate-400">Ctrl+V로 이미지 붙여넣기 가능</span>
+                  <span className="text-xs text-slate-500">{content.length} / 5000</span>
                 </div>
               </div>
 
               {/* Image Upload */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-900 mb-2">
-                  이미지 첨부 <span className="text-gray-500 font-normal">(선택)</span>
+                <label className="block text-sm font-medium text-slate-900 mb-2">
+                  이미지 첨부 <span className="text-slate-500 font-normal">(선택)</span>
                 </label>
 
                 {imagePreview ? (
@@ -263,7 +265,7 @@ export default function WritePost() {
                     <img
                       src={imagePreview}
                       alt="미리보기"
-                      className="w-full max-h-80 object-contain rounded border border-gray-200 bg-gray-50"
+                      className="w-full max-h-80 object-contain rounded border border-slate-200 bg-slate-50"
                     />
                     <button
                       type="button"
@@ -278,13 +280,13 @@ export default function WritePost() {
                 ) : (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center cursor-pointer hover:border-blue-300 transition-colors"
+                    className="border-2 border-dashed border-primary-200 rounded-xl p-8 text-center cursor-pointer hover:border-primary-400 hover:bg-primary-50/50 transition-all duration-300"
                   >
-                    <svg className="w-10 h-10 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-10 h-10 mx-auto mb-3 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p className="text-sm text-gray-500 mb-1">클릭하여 이미지 업로드</p>
-                    <p className="text-xs text-gray-400">PNG, JPG, GIF (최대 5MB)</p>
+                    <p className="text-sm text-slate-500 mb-1">클릭하여 이미지 업로드</p>
+                    <p className="text-xs text-slate-400">PNG, JPG, GIF (최대 5MB)</p>
                   </div>
                 )}
 

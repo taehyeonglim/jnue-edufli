@@ -22,7 +22,7 @@ export default function PostItem({ post, isLast }: PostItemProps) {
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <h3 className="font-medium text-gray-900 truncate hover:text-blue-600 transition-colors">
+          <h3 className="font-medium text-slate-900 truncate hover:text-blue-600 transition-colors">
             {post.title}
           </h3>
           {post.imageURL && (
@@ -31,8 +31,8 @@ export default function PostItem({ post, isLast }: PostItemProps) {
             </svg>
           )}
         </div>
-        <p className="text-sm text-gray-500 truncate mb-2">{post.content}</p>
-        <div className="flex items-center gap-4 text-xs text-gray-500">
+        <p className="text-sm text-slate-500 truncate mb-2">{post.content}</p>
+        <div className="flex items-center gap-4 text-xs text-slate-500">
           <span className="flex items-center gap-1">
             <span>{post.authorName}</span>
             <span style={{ color: tierInfo.color }}>{tierInfo.emoji}</span>
@@ -44,17 +44,15 @@ export default function PostItem({ post, isLast }: PostItemProps) {
         <img
           src={post.imageURL}
           alt="썸네일"
-          className="w-16 h-16 object-cover rounded border border-gray-200 shrink-0"
+          className="w-16 h-16 object-cover rounded border border-slate-200 shrink-0"
         />
       )}
-      <div className="flex items-center gap-4 text-sm shrink-0">
-        <span className="flex items-center gap-1 text-gray-500">
-          <span className="text-red-400">♥</span>
-          <span>{post.likes.length}</span>
+      <div className="flex items-center gap-2 text-sm shrink-0">
+        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 text-red-400 text-xs font-semibold">
+          ♥ {post.likes.length}
         </span>
-        <span className="flex items-center gap-1 text-gray-500">
-          <span>💬</span>
-          <span>{post.comments.length}</span>
+        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold">
+          💬 {post.comments.length}
         </span>
       </div>
     </Link>
