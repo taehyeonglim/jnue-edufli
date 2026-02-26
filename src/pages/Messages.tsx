@@ -75,7 +75,7 @@ export default function Messages() {
         <div className="container-xs">
           <div className="card text-center py-16">
             <div className="text-5xl mb-4">🔒</div>
-            <p className="text-gray-500 mb-6">로그인이 필요합니다</p>
+            <p className="text-slate-500 mb-6">로그인이 필요합니다</p>
             <Link to="/" className="btn btn-primary">
               홈으로 가기
             </Link>
@@ -98,17 +98,13 @@ export default function Messages() {
       <div className="section">
         <div className="container-sm">
           {/* Tabs */}
-          <div className="flex gap-2 mb-6">
+          <div className="tabs mb-6">
             <button
               onClick={() => {
                 setActiveTab('received')
                 setSelectedMessage(null)
               }}
-              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
-                activeTab === 'received'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`tab ${activeTab === 'received' ? 'tab-active' : ''}`}
             >
               📥 받은 쪽지
               {messages.filter((m) => !m.isRead && activeTab === 'received').length > 0 && (
@@ -122,11 +118,7 @@ export default function Messages() {
                 setActiveTab('sent')
                 setSelectedMessage(null)
               }}
-              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
-                activeTab === 'sent'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`tab ${activeTab === 'sent' ? 'tab-active' : ''}`}
             >
               📤 보낸 쪽지
             </button>
@@ -136,7 +128,7 @@ export default function Messages() {
             {/* Message List */}
             <div className="card">
               <div className="card-header">
-                <h2 className="heading-3 text-blue-600">
+                <h2 className="heading-3 text-primary-600">
                   {activeTab === 'received' ? '받은 쪽지' : '보낸 쪽지'}
                 </h2>
               </div>
@@ -147,10 +139,10 @@ export default function Messages() {
                   </div>
                 ) : messages.length === 0 ? (
                   <div className="text-center py-12">
-                    <div className="text-4xl mb-3">
+                    <div className="text-5xl mb-4">
                       {activeTab === 'received' ? '📭' : '📤'}
                     </div>
-                    <p className="text-gray-500">
+                    <p className="text-slate-500">
                       {activeTab === 'received'
                         ? '받은 쪽지가 없습니다'
                         : '보낸 쪽지가 없습니다'}
@@ -176,7 +168,7 @@ export default function Messages() {
             {/* Message Detail */}
             <div className="card">
               <div className="card-header">
-                <h2 className="heading-3 text-blue-600">쪽지 내용</h2>
+                <h2 className="heading-3 text-primary-600">쪽지 내용</h2>
               </div>
               <div className="card-body">
                 {selectedMessage ? (
@@ -186,8 +178,8 @@ export default function Messages() {
                   />
                 ) : (
                   <div className="text-center py-12">
-                    <div className="text-4xl mb-3">💌</div>
-                    <p className="text-gray-500">쪽지를 선택하세요</p>
+                    <div className="text-5xl mb-4">💌</div>
+                    <p className="text-slate-500">쪽지를 선택하세요</p>
                   </div>
                 )}
               </div>
@@ -218,12 +210,12 @@ const MessageListItem = memo(function MessageListItem({
   return (
     <div
       onClick={onClick}
-      className={`p-5 border-b border-gray-200 cursor-pointer transition-colors ${
+      className={`p-5 border-b border-slate-200 cursor-pointer transition-colors ${
         isSelected
-          ? 'bg-blue-50'
+          ? 'bg-primary-50'
           : isUnread
-          ? 'bg-teal-50 hover:bg-teal-100'
-          : 'hover:bg-gray-100'
+          ? 'bg-accent-50 hover:bg-accent-100'
+          : 'hover:bg-slate-100'
       }`}
     >
       <div className="flex items-start gap-3">
@@ -236,9 +228,9 @@ const MessageListItem = memo(function MessageListItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             {isUnread && (
-              <span className="w-2 h-2 bg-teal-500 rounded-full shrink-0" />
+              <span className="w-2 h-2 bg-accent-500 rounded-full shrink-0" />
             )}
-            <span className="text-sm font-medium text-gray-900 truncate">
+            <span className="text-sm font-medium text-slate-900 truncate">
               {type === 'received' ? message.senderName : message.receiverName}
             </span>
             <span className="text-xs" style={{ color: tierInfo.color }}>
@@ -247,12 +239,12 @@ const MessageListItem = memo(function MessageListItem({
           </div>
           <p
             className={`text-sm truncate mb-1 ${
-              isUnread ? 'text-gray-900 font-medium' : 'text-gray-500'
+              isUnread ? 'text-slate-900 font-medium' : 'text-slate-500'
             }`}
           >
             {message.title}
           </p>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-slate-400">
             {message.createdAt.toLocaleString('ko-KR')}
           </span>
         </div>
@@ -285,7 +277,7 @@ function MessageDetail({
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
+      <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-200">
         <img
           src={message.senderPhotoURL || '/default-avatar.svg'}
           alt={message.senderName}
@@ -294,7 +286,7 @@ function MessageDetail({
         />
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-semibold text-gray-900">
+            <span className="font-semibold text-slate-900">
               {type === 'received' ? message.senderName : message.receiverName}
             </span>
             <span
@@ -307,17 +299,17 @@ function MessageDetail({
               {tierInfo.emoji} {tierInfo.name}
             </span>
           </div>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-slate-500">
             {message.createdAt.toLocaleString('ko-KR')}
           </span>
         </div>
       </div>
 
       {/* Title */}
-      <h3 className="text-lg font-semibold text-blue-600 mb-4">{message.title}</h3>
+      <h3 className="text-lg font-semibold text-primary-600 mb-4">{message.title}</h3>
 
       {/* Content */}
-      <div className="text-gray-900/90 whitespace-pre-wrap leading-relaxed min-h-[150px]">
+      <div className="text-slate-900/90 whitespace-pre-wrap leading-relaxed min-h-[150px]">
         {message.content}
       </div>
     </div>

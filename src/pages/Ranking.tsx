@@ -110,7 +110,7 @@ export default function Ranking() {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="font-semibold text-gray-900 truncate">
+                    <span className="font-semibold text-slate-900 truncate">
                       {currentUser.nickname || currentUser.displayName}
                     </span>
                     <span
@@ -124,12 +124,12 @@ export default function Ranking() {
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xl font-bold text-blue-600">{currentUser.points}P</span>
+                    <span className="text-xl font-bold text-primary-600">{currentUser.points}P</span>
                     {(() => {
                       const nextTierInfo = getNextTier(currentUser.tier, currentUser.points)
                       if (nextTierInfo) {
                         return (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-slate-500">
                             {TIER_INFO[nextTierInfo.tier].emoji} {nextTierInfo.pointsNeeded}P 남음
                           </span>
                         )
@@ -140,8 +140,8 @@ export default function Ranking() {
                 </div>
 
                 <div className="text-center px-4 shrink-0">
-                  <p className="text-xs text-gray-500 mb-1">내 순위</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-xs text-slate-500 mb-1">내 순위</p>
+                  <p className="text-2xl font-bold text-primary-600">
                     #{currentUserRank || '-'}
                   </p>
                 </div>
@@ -158,7 +158,7 @@ export default function Ranking() {
 
                 return (
                   <div className="mt-4">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1.5">
+                    <div className="flex justify-between text-xs text-slate-500 mb-1.5">
                       <span className="flex items-center gap-1">
                         <span>{TIER_INFO[currentUser.tier].emoji}</span>
                         <span>{TIER_INFO[currentUser.tier].name}</span>
@@ -182,7 +182,7 @@ export default function Ranking() {
 
           {/* Tier Legend */}
           <div className="card p-6 mb-6">
-            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-4">티어 기준</h3>
+            <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-4">티어 기준</h3>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
               {(['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master'] as TierType[]).map((tier) => (
                 <div
@@ -205,7 +205,7 @@ export default function Ranking() {
           {!error && <div className="card overflow-hidden">
             {/* Header */}
             <div
-              className="grid grid-cols-[3rem_1fr_auto_6rem] gap-4 px-6 py-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200"
+              className="hidden sm:grid grid-cols-[3rem_1fr_auto_6rem] gap-4 px-6 py-5 bg-slate-50 text-xs font-medium text-slate-500 uppercase tracking-wide border-b border-slate-200"
             >
               <span className="text-center">#</span>
               <span>유저</span>
@@ -214,9 +214,9 @@ export default function Ranking() {
             </div>
 
             {users.length === 0 ? (
-              <div className="p-12 text-center">
-                <div className="text-4xl mb-3">🏆</div>
-                <p className="text-gray-500">아직 랭킹 데이터가 없습니다</p>
+              <div className="py-12 text-center">
+                <div className="text-5xl mb-4">🏆</div>
+                <p className="text-slate-500">아직 랭킹 데이터가 없습니다</p>
               </div>
             ) : (
               <div>
@@ -263,9 +263,9 @@ const RankingRow = memo(function RankingRow({
 }) {
   const getRankDisplay = () => {
     if (rank === 1) return { emoji: '🥇', className: 'text-yellow-400 font-bold text-lg' }
-    if (rank === 2) return { emoji: '🥈', className: 'text-gray-300 font-bold' }
+    if (rank === 2) return { emoji: '🥈', className: 'text-slate-300 font-bold' }
     if (rank === 3) return { emoji: '🥉', className: 'text-amber-600 font-bold' }
-    return { emoji: String(rank), className: 'text-gray-500' }
+    return { emoji: String(rank), className: 'text-slate-500' }
   }
 
   const rankDisplay = getRankDisplay()
@@ -279,31 +279,39 @@ const RankingRow = memo(function RankingRow({
     : rank === 3
     ? 'bg-gradient-to-r from-orange-50/80 to-amber-50/50 border-l-4 border-l-orange-400'
     : isCurrentUser
-    ? 'bg-blue-50/80 border-l-4 border-l-blue-400'
+    ? 'bg-primary-50/80 border-l-4 border-l-primary-400'
     : 'hover:bg-slate-50/80'
 
   return (
     <div
-      className={`grid grid-cols-[3rem_1fr_auto_6rem] gap-4 px-6 py-5 items-center border-b border-gray-200 transition-colors ${rowClass}`}
+      className={`flex items-center gap-3 sm:grid sm:grid-cols-[3rem_1fr_auto_6rem] sm:gap-4 px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 transition-colors ${rowClass}`}
     >
-      <span className={`text-center ${rankDisplay.className}`}>
+      <span className={`text-center shrink-0 w-8 sm:w-auto ${rankDisplay.className}`}>
         {rankDisplay.emoji}
       </span>
 
-      <div className="flex items-center gap-3 min-w-0">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
         <img
           src={user.photoURL || '/default-avatar.svg'}
           alt={displayName}
           className="avatar avatar-sm"
           style={{ borderColor: tierInfo.color }}
         />
-        <span className={`font-medium truncate ${isCurrentUser ? 'text-blue-600' : 'text-gray-900'}`}>
-          {displayName}
-          {isCurrentUser && <span className="ml-1.5 text-xs text-teal-500">(나)</span>}
-        </span>
+        <div className="min-w-0">
+          <span className={`font-medium truncate block ${isCurrentUser ? 'text-primary-600' : 'text-slate-900'}`}>
+            {displayName}
+            {isCurrentUser && <span className="ml-1.5 text-xs text-accent-500">(나)</span>}
+          </span>
+          <span
+            className="sm:hidden text-xs font-medium"
+            style={{ color: tierInfo.color }}
+          >
+            {tierInfo.emoji} {tierInfo.name}
+          </span>
+        </div>
       </div>
 
-      <div className="flex items-center">
+      <div className="hidden sm:flex items-center">
         <span
           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
           style={{ backgroundColor: `${tierInfo.color}20`, color: tierInfo.color }}
@@ -312,10 +320,10 @@ const RankingRow = memo(function RankingRow({
         </span>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <span
           className={`font-bold ${rank <= 3 ? 'text-lg' : ''}`}
-          style={rank <= 3 ? { color: tierInfo.color } : { color: '#2563EB' }}
+          style={rank <= 3 ? { color: tierInfo.color } : { color: '#4F46E5' }}
         >
           {user.points}P
         </span>
@@ -325,7 +333,7 @@ const RankingRow = memo(function RankingRow({
               e.stopPropagation()
               onMessage()
             }}
-            className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded transition-colors"
+            className="p-1.5 text-slate-500 hover:text-primary-600 hover:bg-slate-100 rounded transition-colors"
             title="쪽지 보내기"
             aria-label={`${displayName}에게 쪽지 보내기`}
           >

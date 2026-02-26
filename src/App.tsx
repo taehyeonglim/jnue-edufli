@@ -96,7 +96,7 @@ export default function App() {
                   <div className="container-xs">
                     <div className="card text-center py-16">
                       <div className="text-5xl mb-4">404</div>
-                      <p className="text-gray-500 mb-6">페이지를 찾을 수 없습니다</p>
+                      <p className="text-slate-500 mb-6">페이지를 찾을 수 없습니다</p>
                       <a href="/" className="btn btn-primary">홈으로 가기</a>
                     </div>
                   </div>

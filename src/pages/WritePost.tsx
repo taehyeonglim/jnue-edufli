@@ -118,11 +118,11 @@ export default function WritePost() {
       <div className="container-sm">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <Link to="/" className="hover:text-blue-600 transition-colors">홈</Link>
+          <Link to="/" className="hover:text-primary-600 transition-colors">홈</Link>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          <Link to={categoryLink} className="hover:text-blue-600 transition-colors flex items-center gap-1">
+          <Link to={categoryLink} className="hover:text-primary-600 transition-colors flex items-center gap-1">
             <span>{info.icon}</span>
             <span>{info.name}</span>
           </Link>
@@ -137,7 +137,7 @@ export default function WritePost() {
           <div className="card-header flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-2xl">{info.icon}</span>
-              <h1 className="heading-3 text-blue-600">{info.name}</h1>
+              <h1 className="heading-3 text-primary-600">{info.name}</h1>
             </div>
             <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-sm font-bold rounded-full shadow-lg shadow-primary-500/30">
               ✨ +{categoryPoints}P

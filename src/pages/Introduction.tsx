@@ -47,7 +47,7 @@ export default function Introduction() {
           ) : posts.length === 0 ? (
             <div className="card text-center py-16">
               <div className="text-5xl mb-4">👋</div>
-              <p className="text-gray-500 mb-6">아직 자기소개가 없습니다</p>
+              <p className="text-slate-500 mb-6">아직 자기소개가 없습니다</p>
               {currentUser && (
                 <Link to="/write?category=introduction" className="btn btn-primary">
                   첫 자기소개 작성하기

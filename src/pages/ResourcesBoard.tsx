@@ -46,7 +46,7 @@ export default function ResourcesBoard() {
           ) : posts.length === 0 ? (
             <div className="card text-center py-16">
               <div className="text-5xl mb-4">{CATEGORY_INFO.resources.icon}</div>
-              <p className="text-gray-500 mb-6">아직 등록된 자료가 없습니다</p>
+              <p className="text-slate-500 mb-6">아직 등록된 자료가 없습니다</p>
               {currentUser && (
                 <Link to="/write?category=resources" className="btn btn-accent">
                   첫 자료 업로드하기

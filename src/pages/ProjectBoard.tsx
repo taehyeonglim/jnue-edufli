@@ -46,7 +46,7 @@ export default function ProjectBoard() {
           ) : posts.length === 0 ? (
             <div className="card text-center py-16">
               <div className="text-5xl mb-4">{CATEGORY_INFO.project.icon}</div>
-              <p className="text-gray-500 mb-6">아직 등록된 프로젝트가 없습니다</p>
+              <p className="text-slate-500 mb-6">아직 등록된 프로젝트가 없습니다</p>
               {currentUser && (
                 <Link to="/write?category=project" className="btn btn-primary">
                   첫 프로젝트 등록하기

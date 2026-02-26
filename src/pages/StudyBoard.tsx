@@ -46,7 +46,7 @@ export default function StudyBoard() {
           ) : posts.length === 0 ? (
             <div className="card text-center py-16">
               <div className="text-5xl mb-4">{CATEGORY_INFO.study.icon}</div>
-              <p className="text-gray-500 mb-6">아직 게시글이 없습니다</p>
+              <p className="text-slate-500 mb-6">아직 게시글이 없습니다</p>
               {currentUser && (
                 <Link to="/write?category=study" className="btn btn-primary">
                   첫 글 작성하기

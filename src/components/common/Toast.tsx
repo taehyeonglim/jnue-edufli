@@ -53,9 +53,9 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
   }, [onDismiss])
 
   const styles = {
-    success: 'bg-teal-500 text-white',
+    success: 'bg-green-500 text-white',
     error: 'bg-red-500 text-white',
-    info: 'bg-blue-500 text-white',
+    info: 'bg-primary-500 text-white',
   }
 
   const icons = {

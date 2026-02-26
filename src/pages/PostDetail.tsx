@@ -126,7 +126,7 @@ export default function PostDetail() {
         <div className="container-xs">
           <div className="card text-center py-16">
             <div className="text-5xl mb-4">😢</div>
-            <p className="text-gray-500 mb-6">게시글을 찾을 수 없습니다</p>
+            <p className="text-slate-500 mb-6">게시글을 찾을 수 없습니다</p>
             <button onClick={() => navigate(-1)} className="btn btn-secondary">
               돌아가기
             </button>
@@ -146,12 +146,12 @@ export default function PostDetail() {
     <div className="section">
       <div className="container-sm">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-          <Link to="/" className="hover:text-blue-600 transition-colors">홈</Link>
+        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+          <Link to="/" className="hover:text-primary-600 transition-colors">홈</Link>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          <Link to={categoryInfo.link} className="hover:text-blue-600 transition-colors flex items-center gap-1">
+          <Link to={categoryInfo.link} className="hover:text-primary-600 transition-colors flex items-center gap-1">
             <span>{categoryInfo.icon}</span>
             <span>{categoryInfo.label}</span>
           </Link>
@@ -171,7 +171,7 @@ export default function PostDetail() {
                 />
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="font-semibold text-gray-900">{post.authorName}</span>
+                    <span className="font-semibold text-slate-900">{post.authorName}</span>
                     <span
                       className="text-xs font-semibold px-3 py-1 rounded-full"
                       style={{
@@ -182,7 +182,7 @@ export default function PostDetail() {
                       {tierInfo.emoji} {tierInfo.name}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-slate-500">
                     {post.createdAt.toLocaleString('ko-KR')}
                   </span>
                 </div>
@@ -193,7 +193,7 @@ export default function PostDetail() {
                   {isAuthor && (
                     <Link
                       to={`/edit/${post.id}`}
-                      className="text-xs text-gray-500 hover:text-blue-600 transition-colors px-2 py-1"
+                      className="text-xs text-slate-500 hover:text-primary-600 transition-colors px-2 py-1"
                     >
                       수정
                     </Link>
@@ -209,8 +209,8 @@ export default function PostDetail() {
             </div>
 
             {/* Title & Content */}
-            <h1 className="heading-2 text-blue-600 mb-4">{post.title}</h1>
-            <div className="text-gray-900/90 whitespace-pre-wrap leading-relaxed mb-4">{post.content}</div>
+            <h1 className="heading-2 text-primary-600 mb-4">{post.title}</h1>
+            <div className="text-slate-900/90 whitespace-pre-wrap leading-relaxed mb-4">{post.content}</div>
 
             {/* Post Image */}
             {post.imageURL && (
@@ -218,7 +218,7 @@ export default function PostDetail() {
                 <img
                   src={post.imageURL}
                   alt={`${post.title} 첨부 이미지`}
-                  className="w-full max-h-[500px] object-contain rounded-lg border border-gray-200 bg-gray-50 cursor-pointer hover:opacity-90 transition-opacity"
+                  className="w-full max-h-[500px] object-contain rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:opacity-90 transition-opacity"
                   loading="lazy"
                   onClick={() => window.open(post.imageURL, '_blank')}
                 />
@@ -226,7 +226,7 @@ export default function PostDetail() {
             )}
 
             {/* Actions */}
-            <div className="flex items-center gap-4 mt-8 pt-5 border-t border-gray-200">
+            <div className="flex items-center gap-4 mt-8 pt-5 border-t border-slate-200">
               <button
                 onClick={handleLike}
                 disabled={!currentUser || isAuthor}
@@ -239,13 +239,13 @@ export default function PostDetail() {
                 <span>❤️</span>
                 <span>{post.likes.length}</span>
               </button>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-slate-500">
                 💬 댓글 {post.comments.length}개
               </span>
               {currentUser && !isAuthor && (
                 <button
                   onClick={() => handleSendMessage(post.authorId)}
-                  className="flex items-center gap-2 px-4 py-2 rounded text-sm font-medium bg-gray-50 text-gray-500 border border-gray-200 hover:border-blue-400 hover:text-gray-900 transition-all ml-auto"
+                  className="flex items-center gap-2 px-4 py-2 rounded text-sm font-medium bg-slate-50 text-slate-500 border border-slate-200 hover:border-primary-400 hover:text-slate-900 transition-all ml-auto"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -260,10 +260,10 @@ export default function PostDetail() {
         {/* Comments Section */}
         <section className="card">
           <div className="card-header">
-            <h2 className="heading-3 text-blue-600 flex items-center gap-2">
+            <h2 className="heading-3 text-primary-600 flex items-center gap-2">
               <span>💬</span>
               <span>댓글</span>
-              <span className="text-sm font-normal text-gray-500">({post.comments.length})</span>
+              <span className="text-sm font-normal text-slate-500">({post.comments.length})</span>
             </h2>
           </div>
           <div className="card-body">
@@ -278,7 +278,7 @@ export default function PostDetail() {
                   maxLength={500}
                 />
                 <div className="flex items-center justify-between mt-3">
-                  <span className="text-xs text-gray-500">{commentText.length}/500</span>
+                  <span className="text-xs text-slate-500">{commentText.length}/500</span>
                   <button
                     type="submit"
                     disabled={!commentText.trim() || submitting}
@@ -352,7 +352,7 @@ function CommentItem({
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-          <span className="text-sm font-medium text-gray-900">{comment.authorName}</span>
+          <span className="text-sm font-medium text-slate-900">{comment.authorName}</span>
           <span className="text-xs" style={{ color: tierInfo.color }}>
             {tierInfo.emoji}
           </span>
@@ -368,7 +368,7 @@ function CommentItem({
             </button>
           )}
         </div>
-        <p className="text-sm text-gray-900/80 leading-relaxed">{comment.content}</p>
+        <p className="text-sm text-slate-900/80 leading-relaxed">{comment.content}</p>
       </div>
     </div>
   )

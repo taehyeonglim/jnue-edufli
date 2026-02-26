@@ -317,14 +317,14 @@ export default function MyPage() {
           {activeTab === 'profile' ? (
             <div className="card">
               <div className="card-header">
-                <h2 className="heading-3 text-blue-600 flex items-center gap-2">
+                <h2 className="heading-3 text-primary-600 flex items-center gap-2">
                   <span>⚙️</span>
                   <span>회원정보 수정</span>
                 </h2>
               </div>
               <div className="card-body">
                 <div className="space-y-5 max-w-md">
-                  <div className="p-4 bg-teal-50 border border-teal-200 rounded-lg text-sm text-teal-700">
+                  <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg text-sm text-primary-700">
                     💡 프로필 사진을 변경하려면 위의 프로필 이미지에 마우스를 올려보세요!
                   </div>
 
@@ -428,15 +428,15 @@ export default function MyPage() {
           ) : (
             <div className="card">
               <div className="card-header">
-                <h2 className="heading-3 text-blue-600 flex items-center gap-2">
+                <h2 className="heading-3 text-primary-600 flex items-center gap-2">
                   <span>📝</span>
                   <span>내가 쓴 글</span>
                 </h2>
               </div>
               <div className="card-body">
                 {posts.length === 0 ? (
-                  <div className="text-center py-10">
-                    <div className="text-4xl mb-3">📝</div>
+                  <div className="text-center py-12">
+                    <div className="text-5xl mb-4">📝</div>
                     <p className="text-slate-500 mb-4">아직 작성한 글이 없습니다</p>
                     <Link to="/write?category=introduction" className="btn btn-primary">
                       첫 글 작성하기
@@ -448,10 +448,10 @@ export default function MyPage() {
                       <Link
                         key={post.id}
                         to={`/post/${post.id}`}
-                        className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors"
+                        className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-primary-300 transition-colors"
                       >
                         <div className="min-w-0 flex-1">
-                          <span className="text-xs text-teal-600 mr-2">[{getCategoryLabel(post.category)}]</span>
+                          <span className="text-xs text-primary-500 mr-2">[{getCategoryLabel(post.category)}]</span>
                           <span className="text-sm text-slate-900">{post.title}</span>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-slate-500 shrink-0">
