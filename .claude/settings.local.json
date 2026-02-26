@@ -28,7 +28,25 @@
       "Bash(git -C \"c:\\\\Users\\\\user\\\\Documents\\\\GitHub\\\\jnue-edufli\" log --oneline -5)",
       "Bash(git -C \"c:\\\\Users\\\\user\\\\Documents\\\\GitHub\\\\jnue-edufli\" add index.html package.json package-lock.json src/App.tsx src/components/common/OnlineUsers.tsx src/components/common/ErrorBoundary.tsx src/components/common/PostItem.tsx src/contexts/AuthContext.tsx src/index.css src/pages/Admin.tsx src/pages/EditPost.tsx src/pages/Gallery.tsx src/pages/Introduction.tsx src/pages/MyPage.tsx src/pages/PostDetail.tsx src/pages/ProjectBoard.tsx src/pages/Ranking.tsx src/pages/ResourcesBoard.tsx src/pages/StudyBoard.tsx src/pages/WritePost.tsx src/services/postService.ts src/utils/helpers.ts)",
       "Bash(git -C \"c:\\\\Users\\\\user\\\\Documents\\\\GitHub\\\\jnue-edufli\" commit -m \"$\\(cat <<''EOF''\nComprehensive code review fixes and refactoring\n\n- Fix Firestore queries: use where/orderBy instead of full collection scans\n- Fix comment deletion: replace arrayRemove with read-filter-write for Timestamp precision\n- Fix challenger tier removal: recalculate tier from points instead of hardcoding master\n- Fix Admin adjustPoints: recalculate tier on point changes\n- Fix memory leaks: revoke blob ObjectURLs in WritePost, EditPost image handling\n- Add React.lazy/Suspense code splitting for all page routes \\(bundle 718KB -> 616KB\\)\n- Add ErrorBoundary component wrapping entire app\n- Extract shared PostItem component \\(eliminates 4 duplicate implementations\\)\n- Extract shared helpers: getNextTier, getCategoryRoute, getCategoryLabel\n- Remove duplicated calculateTier from OnlineUsers, import from AuthContext\n- Add Pretendard Variable font CDN for Korean typography\n- Move vite, plugin-react, tailwindcss/postcss to devDependencies\n- Add 404 catch-all route\n- Add card-primary and card-gold CSS utility classes\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(wc -l:*)",
+      "Bash(npm list:*)",
+      "Bash(npm ls:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(python3:*)",
+      "Bash(node -e:*)",
+      "Bash(node -e \"const fs=require\\(''fs''\\); fs.writeFileSync\\(''C:/Users/USER/Documents/GitHub/jnue-edufli/write_edit.js'', ''console.log\\(1\\)''\\); console.log\\(''ok''\\)\")",
+      "Bash(powershell.exe -Command \"Set-Content -Path ''C:\\\\Users\\\\USER\\\\Documents\\\\GitHub\\\\jnue-edufli\\\\src\\\\pages\\\\WritePost.tsx'' -Value ''test123'' -Encoding UTF8\")",
+      "Bash(printf:*)",
+      "Bash(node:*)",
+      "Bash(/tmp/write_file.py:*)",
+      "Bash(/tmp/b64data.txt:*)",
+      "Bash(git -C \"C:/Users/USER/Documents/GitHub/jnue-edufli\" checkout -- src/pages/PostDetail.tsx)",
+      "Bash(powershell.exe -Command \"[System.IO.File]::WriteAllText\\(''C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\b64data.txt'', ''test123''\\)\")",
+      "Bash(tee \"C:/Users/USER/Documents/GitHub/jnue-edufli/src/pages/PostDetail.tsx\" import { useState, useEffect } from 'react' import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom' import Box from '@mui/material/Box' import Container from '@mui/material/Container' import Paper from '@mui/material/Paper' import Typography from '@mui/material/Typography' import Avatar from '@mui/material/Avatar' import Button from '@mui/material/Button' import IconButton from '@mui/material/IconButton' import TextField from '@mui/material/TextField' import Stack from '@mui/material/Stack' import Chip from '@mui/material/Chip' import Divider from '@mui/material/Divider' import Breadcrumbs from '@mui/material/Breadcrumbs' import Link from '@mui/material/Link' import Alert from '@mui/material/Alert' import FavoriteIcon from '@mui/icons-material/Favorite' import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder' import MailOutlineIcon from '@mui/icons-material/MailOutline' import ChevronRightIcon from '@mui/icons-material/ChevronRight' import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline' import EditIcon from '@mui/icons-material/Edit' import { useAuth } from '../contexts/AuthContext' import { getPost, toggleLike, addComment, deletePost, deleteComment } from '../services/postService' import { getUserById } from '../services/messageService' import { Post, Comment, User, POINT_VALUES, TIER_INFO } from '../types' import LoadingSpinner from '../components/common/LoadingSpinner' import TierBadge from '../components/common/TierBadge' import SendMessageModal from '../components/common/SendMessageModal' import { getCategoryRoute } from '../utils/helpers' ENDOFCONTENT wc -c \"C:/Users/USER/Documents/GitHub/jnue-edufli/src/pages/PostDetail.tsx\")",
+      "Bash(\"C:/Users/USER/AppData/Local/Temp/transform.js\":*)",
+      "Bash(\"C:/Users/USER/AppData/Local/Temp/generate_content.js\":*)",
+      "Bash(python:*)"
     ]
   }
 }
