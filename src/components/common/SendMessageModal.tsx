@@ -1,4 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
+import Avatar from '@mui/material/Avatar'
+import Typography from '@mui/material/Typography'
+import Stack from '@mui/material/Stack'
+import Alert from '@mui/material/Alert'
 import { useAuth } from '../../contexts/AuthContext'
 import { sendMessage } from '../../services/messageService'
 import { User, TIER_INFO } from '../../types'
@@ -21,14 +32,6 @@ export default function SendMessageModal({
   const [error, setError] = useState('')
 
   const tierInfo = TIER_INFO[receiver.tier] || TIER_INFO.bronze
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,110 +68,77 @@ export default function SendMessageModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="쪽지 보내기">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-      />
+    <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <span>💌</span>
+        <Typography variant="h6" component="span" sx={{ color: 'primary.main' }}>
+          쪽지 보내기
+        </Typography>
+      </DialogTitle>
 
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl w-full max-w-lg shadow-xl">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-200">
-          <div className="flex items-center gap-3">
-            <span className="text-xl">💌</span>
-            <h2 className="text-lg font-semibold text-primary-600">쪽지 보내기</h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-            aria-label="쪽지 보내기 닫기"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6">
+      <form onSubmit={handleSubmit}>
+        <DialogContent>
           {/* Receiver Info */}
-          <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded border border-slate-200">
-            <span className="text-sm text-slate-500">받는 사람:</span>
-            <img
-              src={receiver.photoURL || '/default-avatar.svg'}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1.5}
+            sx={{ mb: 3, p: 2, bgcolor: 'action.hover', borderRadius: 2 }}
+          >
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>받는 사람:</Typography>
+            <Avatar
+              src={receiver.photoURL || undefined}
               alt={receiver.nickname || receiver.displayName}
-              className="avatar avatar-sm"
-              style={{ borderColor: tierInfo.color }}
+              sx={{ width: 32, height: 32, borderColor: tierInfo.color }}
             />
-            <span className="font-medium text-slate-900">
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
               {receiver.nickname || receiver.displayName}
-            </span>
-            <span className="text-sm" style={{ color: tierInfo.color }}>
+            </Typography>
+            <Typography variant="body2" sx={{ color: tierInfo.color }}>
               {tierInfo.emoji}
-            </span>
-          </div>
+            </Typography>
+          </Stack>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-400">
-              {error}
-            </div>
+            <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
           )}
 
-          {/* Title */}
-          <div className="mb-4">
-            <label htmlFor="title" className="block text-sm font-medium text-slate-900 mb-2">
-              제목
-            </label>
-            <input
-              type="text"
-              id="title"
+          <Stack spacing={2.5}>
+            <TextField
+              label="제목"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="제목을 입력하세요"
-              className="input"
-              maxLength={100}
+              fullWidth
+              inputProps={{ maxLength: 100 }}
             />
-          </div>
+            <Box>
+              <TextField
+                label="내용"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="내용을 입력하세요"
+                fullWidth
+                multiline
+                rows={6}
+                inputProps={{ maxLength: 1000 }}
+              />
+              <Typography variant="caption" sx={{ display: 'block', textAlign: 'right', mt: 0.5, color: 'text.disabled' }}>
+                {content.length} / 1000
+              </Typography>
+            </Box>
+          </Stack>
+        </DialogContent>
 
-          {/* Content */}
-          <div className="mb-4">
-            <label htmlFor="content" className="block text-sm font-medium text-slate-900 mb-2">
-              내용
-            </label>
-            <textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="내용을 입력하세요"
-              className="input textarea h-40"
-              maxLength={1000}
-            />
-            <div className="flex justify-end mt-1">
-              <span className="text-xs text-slate-500">{content.length} / 1000</span>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-4 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 btn btn-secondary"
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="flex-1 btn btn-primary"
-            >
-              {submitting ? '전송 중...' : '보내기'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button onClick={onClose} variant="outlined" sx={{ flex: 1 }}>
+            취소
+          </Button>
+          <Button type="submit" variant="contained" disabled={submitting} sx={{ flex: 1 }}>
+            {submitting ? '전송 중...' : '보내기'}
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   )
 }

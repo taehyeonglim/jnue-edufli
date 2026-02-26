@@ -4,6 +4,21 @@ import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { User, TIER_INFO, TierType, POINT_VALUES, CATEGORY_INFO, TIER_THRESHOLDS } from '../types'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Paper from '@mui/material/Paper'
+import Avatar from '@mui/material/Avatar'
+import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack'
+import Divider from '@mui/material/Divider'
+import Card from '@mui/material/Card'
+import CardActionArea from '@mui/material/CardActionArea'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import LoginIcon from '@mui/icons-material/Login'
+import { gradientTextSx } from '../theme/tierColors'
 
 export default function Home() {
   const { currentUser, signInWithGoogle } = useAuth()
@@ -70,311 +85,253 @@ export default function Home() {
   const tiers: TierType[] = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'challenger']
 
   return (
-    <div className="min-h-screen">
+    <Box>
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 md:py-20">
-        {/* Decorative Elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-accent-400/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '-3s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-primary-200/10 to-transparent rounded-full" />
+      <Box component="section" sx={{ py: { xs: 8, md: 10 }, position: 'relative', overflow: 'hidden' }}>
+        <Container maxWidth="md" sx={{ position: 'relative', textAlign: 'center' }}>
+          {/* Badge */}
+          <Chip
+            label="전주교육대학교 초등교육과 교육공학 동아리"
+            variant="outlined"
+            sx={{ mb: 5, fontSize: '0.8125rem', fontWeight: 500, py: 2.5, px: 1 }}
+          />
 
-        <div className="container relative">
-          <div className="text-center max-w-3xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2.5 px-6 py-2.5 mb-10 bg-white/80 backdrop-blur-xl rounded-full border border-white/50 shadow-lg shadow-black/[0.03]">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent-500"></span>
-              </span>
-              <span className="text-sm font-medium text-slate-600">전주교육대학교 초등교육과 교육공학 동아리</span>
-            </div>
+          {/* Title */}
+          <Typography variant="h1" sx={{ fontSize: { xs: '3rem', md: '4.5rem' }, fontWeight: 800, mb: 3, letterSpacing: '-0.03em' }}>
+            <Box component="span" sx={{ color: 'primary.main' }}>Edu</Box>
+            <Box component="span" sx={{ color: 'secondary.main' }}> FLI</Box>
+          </Typography>
 
-            {/* Title */}
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-              <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-500 bg-clip-text text-transparent">Edu</span>
-              <span className="bg-gradient-to-r from-accent-500 via-accent-400 to-accent-500 bg-clip-text text-transparent"> FLI</span>
-            </h1>
+          {/* Subtitle */}
+          <Typography
+            variant="body1"
+            sx={{
+              fontWeight: 600,
+              letterSpacing: '0.2em',
+              mb: 2,
+              color: 'text.secondary',
+              textTransform: 'uppercase',
+            }}
+          >
+            Education & Future Learning Innovation
+          </Typography>
 
-            {/* Subtitle */}
-            <p className="text-base md:text-lg font-semibold tracking-[0.2em] mb-4 bg-gradient-to-r from-slate-500 to-slate-400 bg-clip-text text-transparent uppercase">
-              Education & Future Learning Innovation
-            </p>
+          <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 400, mb: 6 }}>
+            교육과 기술의 만남, 그 중심에 내가 있다
+          </Typography>
 
-            <p className="text-slate-500 text-lg mb-12 max-w-xl mx-auto">
-              교육과 기술의 만남, 그 중심에 내가 있다
-            </p>
+          {/* CTA */}
+          {!currentUser && (
+            <Button
+              variant="contained"
+              size="large"
+              onClick={handleSignIn}
+              startIcon={<LoginIcon />}
+              sx={{ px: 5, py: 1.5, fontSize: '1.125rem' }}
+            >
+              Google로 시작하기
+            </Button>
+          )}
+        </Container>
+      </Box>
 
-            {/* CTA Buttons */}
-            {!currentUser ? (
-              <button
-                onClick={handleSignIn}
-                className="group relative inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold text-white rounded-2xl overflow-hidden shadow-xl shadow-primary-500/25 hover:shadow-2xl hover:shadow-primary-500/30 transition-all duration-300 hover:-translate-y-0.5"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-primary-500 to-primary-600" />
-                <span className="absolute inset-0 bg-gradient-to-r from-primary-400 to-accent-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative flex items-center gap-3">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                  </svg>
-                  Google로 시작하기
-                </span>
-              </button>
-            ) : null}
-          </div>
-        </div>
-      </section>
-
-      {/* Members Carousel Section */}
+      {/* Members Carousel */}
       {members.length > 0 && (
-        <section className="py-16 md:py-20">
-          <div className="container">
-            <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 mb-5 px-5 py-2 bg-accent-50 rounded-full">
-                <span className="text-lg">👥</span>
-                <span className="text-sm font-medium text-accent-600">Members</span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">반가워요!</h2>
-              <p className="text-slate-500">카드에 마우스를 올려보세요</p>
-            </div>
+        <Box component="section" sx={{ py: { xs: 6, md: 8 } }}>
+          <Container maxWidth="lg">
+            <Box sx={{ textAlign: 'center', mb: 6 }}>
+              <Chip label="👥 Members" color="secondary" variant="outlined" sx={{ mb: 2 }} />
+              <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>반가워요!</Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary' }}>카드에 마우스를 올려보세요</Typography>
+            </Box>
 
-            <div
+            <Box
               ref={carouselRef}
-              className="flex gap-5 overflow-x-auto pt-3 pr-3 pb-6 scroll-smooth"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              sx={{
+                display: 'flex',
+                gap: 2.5,
+                overflowX: 'auto',
+                pt: 1,
+                pb: 3,
+                scrollBehavior: 'smooth',
+                '&::-webkit-scrollbar': { display: 'none' },
+                scrollbarWidth: 'none',
+              }}
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
             >
               {members.map((member, index) => (
                 <MemberCard key={member.uid} member={member} rank={index + 1} isAdmin={currentUser?.isAdmin} />
               ))}
-            </div>
+            </Box>
 
-            <div className="flex justify-center mt-10">
-              <Link
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+              <Button
+                component={Link}
                 to="/ranking"
-                className="group inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all duration-300"
+                variant="contained"
+                endIcon={<ArrowForwardIcon />}
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  background: 'linear-gradient(135deg, #6366F1, #06B6D4)',
+                  borderRadius: 4,
+                }}
               >
-                <span className="text-lg">🏆</span>
-                <span>전체 랭킹 보기</span>
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </section>
+                🏆 전체 랭킹 보기
+              </Button>
+            </Box>
+          </Container>
+        </Box>
       )}
 
-      {/* Section Divider */}
-      <div className="container py-6">
-        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-      </div>
+      <Container maxWidth="md" sx={{ py: 3 }}>
+        <Divider />
+      </Container>
 
       {/* Features Section */}
-      <section className="py-12 md:py-16">
-        <div className="container-sm">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 mb-5 px-5 py-2 bg-primary-50 rounded-full">
-              <span className="text-lg">📋</span>
-              <span className="text-sm font-medium text-primary-600">Boards</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">게시판</h2>
-            <p className="text-slate-500">동아리원들과 소통하세요</p>
-          </div>
+      <Box component="section" sx={{ py: { xs: 6, md: 8 } }}>
+        <Container maxWidth="md">
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Chip label="📋 Boards" color="primary" variant="outlined" sx={{ mb: 2 }} />
+            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>게시판</Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary' }}>동아리원들과 소통하세요</Typography>
+          </Box>
 
-          <div className="grid gap-4">
-            <FeatureCard
-              to="/introduction"
-              title={CATEGORY_INFO.introduction.name}
-              desc={CATEGORY_INFO.introduction.description}
-              icon={CATEGORY_INFO.introduction.icon}
-              points={POINT_VALUES.INTRODUCTION}
-              gradient="from-amber-400 to-orange-400"
-            />
-            <FeatureCard
-              to="/study"
-              title={CATEGORY_INFO.study.name}
-              desc={CATEGORY_INFO.study.description}
-              icon={CATEGORY_INFO.study.icon}
-              points={POINT_VALUES.POST}
-              gradient="from-primary-400 to-primary-500"
-            />
-            <FeatureCard
-              to="/project"
-              title={CATEGORY_INFO.project.name}
-              desc={CATEGORY_INFO.project.description}
-              icon={CATEGORY_INFO.project.icon}
-              points={POINT_VALUES.POST}
-              gradient="from-accent-400 to-cyan-500"
-            />
-            <FeatureCard
-              to="/resources"
-              title={CATEGORY_INFO.resources.name}
-              desc={CATEGORY_INFO.resources.description}
-              icon={CATEGORY_INFO.resources.icon}
-              points={POINT_VALUES.RESOURCE_UPLOAD}
-              gradient="from-violet-400 to-purple-500"
-            />
-          </div>
-        </div>
-      </section>
+          <Stack spacing={2}>
+            <FeatureCard to="/introduction" title={CATEGORY_INFO.introduction.name} desc={CATEGORY_INFO.introduction.description} icon={CATEGORY_INFO.introduction.icon} points={POINT_VALUES.INTRODUCTION} color="#F59E0B" />
+            <FeatureCard to="/study" title={CATEGORY_INFO.study.name} desc={CATEGORY_INFO.study.description} icon={CATEGORY_INFO.study.icon} points={POINT_VALUES.POST} color="#6366F1" />
+            <FeatureCard to="/project" title={CATEGORY_INFO.project.name} desc={CATEGORY_INFO.project.description} icon={CATEGORY_INFO.project.icon} points={POINT_VALUES.POST} color="#06B6D4" />
+            <FeatureCard to="/resources" title={CATEGORY_INFO.resources.name} desc={CATEGORY_INFO.resources.description} icon={CATEGORY_INFO.resources.icon} points={POINT_VALUES.RESOURCE_UPLOAD} color="#8B5CF6" />
+          </Stack>
+        </Container>
+      </Box>
 
-      {/* Section Divider */}
-      <div className="container py-6">
-        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-      </div>
+      <Container maxWidth="md" sx={{ py: 3 }}>
+        <Divider />
+      </Container>
 
       {/* Tier Section */}
-      <section className="py-12 md:py-16">
-        <div className="container-sm">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 mb-5 px-5 py-2 bg-warm-light/30 rounded-full">
-              <span className="text-lg">🏅</span>
-              <span className="text-sm font-medium text-amber-600">Growth System</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">성장 시스템</h2>
-            <p className="text-slate-500">활동하면서 성장해보세요</p>
-          </div>
+      <Box component="section" sx={{ py: { xs: 6, md: 8 } }}>
+        <Container maxWidth="md">
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Chip label="🏅 Growth System" color="warning" variant="outlined" sx={{ mb: 2 }} />
+            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>성장 시스템</Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary' }}>활동하면서 성장해보세요</Typography>
+          </Box>
 
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/50 shadow-xl shadow-black/[0.03] overflow-hidden">
-            <div className="p-8">
-              {/* Tier List */}
-              <div className="flex justify-center gap-3 md:gap-6 mb-10 flex-wrap">
-                {tiers.map((tier, index) => (
-                  <div
-                    key={tier}
-                    className="group relative text-center p-3 rounded-2xl hover:bg-slate-50 transition-all duration-300 cursor-default"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <div className="text-3xl md:text-4xl mb-2 group-hover:scale-110 transition-transform duration-300">
-                      {TIER_INFO[tier].emoji}
-                    </div>
-                    <div
-                      className="text-xs font-bold tracking-wide"
-                      style={{ color: TIER_INFO[tier].color }}
-                    >
-                      {TIER_INFO[tier].name}
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-1">
-                      {TIER_THRESHOLDS[tier].min}P+
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <Paper sx={{ p: { xs: 3, md: 4 }, borderRadius: 4 }}>
+            {/* Tier List */}
+            <Stack direction="row" justifyContent="center" spacing={{ xs: 1, md: 3 }} flexWrap="wrap" useFlexGap sx={{ mb: 5 }}>
+              {tiers.map((tier) => (
+                <Box key={tier} sx={{ textAlign: 'center', p: 1.5, borderRadius: 3, cursor: 'default', '&:hover': { bgcolor: 'action.hover' }, transition: 'background-color 0.2s' }}>
+                  <Typography sx={{ fontSize: { xs: '1.75rem', md: '2rem' }, mb: 0.5 }}>{TIER_INFO[tier].emoji}</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: TIER_INFO[tier].color, display: 'block' }}>{TIER_INFO[tier].name}</Typography>
+                  <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.625rem' }}>{TIER_THRESHOLDS[tier].min}P+</Typography>
+                </Box>
+              ))}
+            </Stack>
 
-              {/* Divider */}
-              <div className="relative my-8">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="px-4 py-1 bg-white text-xs font-medium text-slate-400 rounded-full">
-                    포인트 획득 방법
-                  </span>
-                </div>
-              </div>
+            <Divider sx={{ my: 3 }}>
+              <Chip label="포인트 획득 방법" size="small" variant="outlined" />
+            </Divider>
 
-              {/* Points Guide */}
-              <div className="grid grid-cols-2 gap-3">
-                <PointItem label="자기소개" points={POINT_VALUES.INTRODUCTION} icon="👋" />
-                <PointItem label="게시글 작성" points={POINT_VALUES.POST} icon="✍️" />
-                <PointItem label="댓글 작성" points={POINT_VALUES.COMMENT} icon="💬" />
-                <PointItem label="좋아요 받기" points={POINT_VALUES.LIKE_RECEIVED} icon="❤️" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            {/* Points Guide */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+              <PointItem label="자기소개" points={POINT_VALUES.INTRODUCTION} icon="👋" />
+              <PointItem label="게시글 작성" points={POINT_VALUES.POST} icon="✍️" />
+              <PointItem label="댓글 작성" points={POINT_VALUES.COMMENT} icon="💬" />
+              <PointItem label="좋아요 받기" points={POINT_VALUES.LIKE_RECEIVED} icon="❤️" />
+            </Box>
+          </Paper>
+        </Container>
+      </Box>
 
       {/* CTA Section */}
       {!currentUser && (
-        <section className="py-16 md:py-20">
-          <div className="container-xs">
-            <div className="relative text-center p-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-3xl overflow-hidden shadow-2xl shadow-primary-500/20">
-              {/* Decorative */}
-              <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-              <div className="absolute bottom-0 right-0 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
-
-              <div className="relative">
-                <div className="text-6xl mb-6">💡</div>
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">지금 시작하세요</h2>
-                <p className="text-white/80 text-lg mb-10">전주교대 학생이라면 누구나 환영합니다</p>
-                <button
-                  onClick={handleSignIn}
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-white text-primary-600 font-bold rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300"
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                  </svg>
-                  Google로 로그인
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
+        <Box component="section" sx={{ py: { xs: 8, md: 10 } }}>
+          <Container maxWidth="sm">
+            <Paper
+              sx={{
+                textAlign: 'center',
+                p: { xs: 5, md: 6 },
+                borderRadius: 4,
+                background: 'linear-gradient(135deg, #6366F1, #06B6D4)',
+                color: '#fff',
+              }}
+            >
+              <Typography sx={{ fontSize: '3.5rem', mb: 3 }}>💡</Typography>
+              <Typography variant="h3" sx={{ fontWeight: 800, color: '#fff', mb: 2 }}>지금 시작하세요</Typography>
+              <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mb: 5 }}>전주교대 학생이라면 누구나 환영합니다</Typography>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleSignIn}
+                startIcon={<LoginIcon />}
+                sx={{
+                  bgcolor: '#fff',
+                  color: 'primary.main',
+                  fontWeight: 700,
+                  px: 5,
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' },
+                }}
+              >
+                Google로 로그인
+              </Button>
+            </Paper>
+          </Container>
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }
 
-function FeatureCard({
-  to,
-  title,
-  desc,
-  icon,
-  points,
-  gradient,
-}: {
-  to: string
-  title: string
-  desc: string
-  icon: string
-  points: number
-  gradient: string
-}) {
+function FeatureCard({ to, title, desc, icon, points, color }: { to: string; title: string; desc: string; icon: string; points: number; color: string }) {
   return (
-    <Link
-      to={to}
-      className="group relative flex items-center justify-between p-5 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 shadow-lg shadow-black/[0.02] hover:shadow-xl hover:shadow-black/[0.04] hover:-translate-y-0.5 transition-all duration-300"
-    >
-      <div className="flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-2xl shadow-lg`}>
-          {icon}
-        </div>
-        <div>
-          <h3 className="font-bold text-slate-800 mb-0.5 group-hover:text-primary-600 transition-colors">
-            {title}
-          </h3>
-          <p className="text-sm text-slate-500">{desc}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        <span className="px-3 py-1.5 bg-gradient-to-r from-primary-50 to-accent-50 text-primary-600 text-sm font-bold rounded-lg">
-          +{points}P
-        </span>
-        <svg className="w-5 h-5 text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </div>
-    </Link>
+    <Card variant="outlined" sx={{ borderRadius: 3 }}>
+      <CardActionArea
+        component={Link}
+        to={to}
+        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2.5 }}
+      >
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Avatar sx={{ bgcolor: color, width: 48, height: 48, fontSize: '1.5rem', border: 'none', boxShadow: 'none' }}>
+            {icon}
+          </Avatar>
+          <Box>
+            <Typography variant="body1" sx={{ fontWeight: 700 }}>{title}</Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>{desc}</Typography>
+          </Box>
+        </Stack>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Chip label={`+${points}P`} size="small" color="primary" variant="outlined" sx={{ fontWeight: 700 }} />
+          <ChevronRightIcon sx={{ color: 'text.disabled' }} />
+        </Stack>
+      </CardActionArea>
+    </Card>
   )
 }
 
 function PointItem({ label, points, icon }: { label: string; points: number; icon: string }) {
   return (
-    <div className="flex items-center justify-between p-4 bg-slate-50/80 rounded-xl border border-slate-100 hover:border-primary-200 hover:bg-primary-50/30 transition-all duration-300 group">
-      <div className="flex items-center gap-3">
-        <span className="text-lg group-hover:scale-110 transition-transform">{icon}</span>
-        <span className="text-sm font-medium text-slate-600">{label}</span>
-      </div>
-      <span className="text-primary-600 font-bold">+{points}P</span>
-    </div>
+    <Paper
+      variant="outlined"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        p: 2,
+        borderRadius: 2,
+        '&:hover': { borderColor: 'primary.light', bgcolor: 'primary.50' },
+        transition: 'all 0.2s',
+      }}
+    >
+      <Stack direction="row" alignItems="center" spacing={1.5}>
+        <Typography sx={{ fontSize: '1.125rem' }}>{icon}</Typography>
+        <Typography variant="body2" sx={{ fontWeight: 500 }}>{label}</Typography>
+      </Stack>
+      <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>+{points}P</Typography>
+    </Paper>
   )
 }
 
@@ -383,106 +340,130 @@ function MemberCard({ member, rank, isAdmin }: { member: User; rank: number; isA
   const displayName = member.nickname || member.displayName
 
   return (
-    <div
-      className="relative flex-shrink-0 w-[160px] h-[200px] group"
-      style={{ perspective: '1000px' }}
+    <Box
+      sx={{
+        flexShrink: 0,
+        width: 160,
+        height: 200,
+        perspective: '1000px',
+        '&:hover .flip-inner': { transform: 'rotateY(180deg)' },
+      }}
     >
-      <div
-        className="relative w-full h-full transition-transform duration-500 group-hover:[transform:rotateY(180deg)]"
-        style={{ transformStyle: 'preserve-3d' }}
+      <Box
+        className="flip-inner"
+        sx={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          transition: 'transform 0.5s',
+          transformStyle: 'preserve-3d',
+        }}
       >
         {/* Front Side */}
-        <div
-          className="absolute inset-0 rounded-2xl border border-white/50 p-4 flex flex-col items-center justify-center bg-white/80 backdrop-blur-xl shadow-lg shadow-black/[0.03]"
-          style={{
+        <Paper
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 4,
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
             backfaceVisibility: 'hidden',
           }}
         >
-          {/* Rank Badge - 관리자에게는 표시하지 않음 */}
           {!isAdmin && rank <= 3 && (
-            <div
-              className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-lg"
-              style={{
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                color: '#fff',
                 background: rank === 1
                   ? 'linear-gradient(135deg, #FCD34D, #F59E0B)'
                   : rank === 2
                   ? 'linear-gradient(135deg, #E2E8F0, #94A3B8)'
                   : 'linear-gradient(135deg, #FDBA74, #CD7F32)',
-                color: '#FFFFFF',
               }}
             >
               {rank}
-            </div>
+            </Box>
           )}
 
-          {/* Profile Image */}
-          <div className="relative mb-3">
-            <div
-              className="absolute inset-0 rounded-full blur-md opacity-40"
-              style={{ background: `linear-gradient(135deg, ${tierInfo.color}60, ${tierInfo.color}20)` }}
-            />
-            <img
-              src={member.photoURL || '/default-avatar.svg'}
+          <Box sx={{ position: 'relative', mb: 1.5 }}>
+            <Avatar
+              src={member.photoURL || undefined}
               alt={displayName}
-              className="relative w-16 h-16 rounded-full border-2 object-cover shadow-md"
-              style={{ borderColor: tierInfo.color }}
+              sx={{ width: 64, height: 64, borderColor: tierInfo.color }}
             />
-            <span
-              className="absolute -bottom-1 -right-1 text-lg drop-shadow-md"
+            <Typography
+              sx={{ position: 'absolute', bottom: -4, right: -4, fontSize: '1.125rem' }}
               title={tierInfo.name}
             >
               {tierInfo.emoji}
-            </span>
-          </div>
+            </Typography>
+          </Box>
 
-          {/* Name */}
-          <h3 className="w-full font-bold text-slate-800 text-sm mb-1 truncate text-center">
+          <Typography variant="body2" sx={{ fontWeight: 700, width: '100%', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', mb: 0.5 }}>
             {displayName}
-          </h3>
+          </Typography>
 
-          {/* Tier */}
-          <p className="text-[11px] font-semibold mb-3 text-center" style={{ color: tierInfo.color }}>
+          <Typography variant="caption" sx={{ fontWeight: 600, color: tierInfo.color, mb: 1.5 }}>
             {tierInfo.name}
-          </p>
+          </Typography>
 
-          {/* Points */}
-          <div className="px-4 py-1.5 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full">
-            <span className="text-xs font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-              {member.points.toLocaleString()}P
-            </span>
-          </div>
-        </div>
+          <Chip
+            label={`${member.points.toLocaleString()}P`}
+            size="small"
+            sx={{ fontWeight: 700, ...gradientTextSx, bgcolor: 'primary.50' }}
+          />
+        </Paper>
 
         {/* Back Side */}
-        <div
-          className="absolute inset-0 rounded-2xl border border-primary-200/50 p-4 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-white to-primary-50/30 backdrop-blur-xl shadow-lg"
-          style={{
+        <Paper
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 4,
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1.5,
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
+            bgcolor: 'background.paper',
+            border: 1,
+            borderColor: 'primary.100',
           }}
         >
-          {/* Tier Emoji */}
-          <div className="text-4xl mb-2 drop-shadow-md">{tierInfo.emoji}</div>
-
-          {/* Department */}
-          <div className="w-full text-center">
-            <p className="text-[10px] text-slate-400 mb-0.5">학과</p>
-            <p className="text-sm font-semibold text-slate-700 truncate">
+          <Typography sx={{ fontSize: '2.5rem', mb: 1 }}>{tierInfo.emoji}</Typography>
+          <Box sx={{ width: '100%', textAlign: 'center' }}>
+            <Typography variant="caption" sx={{ color: 'text.disabled' }}>학과</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {member.department || '미등록'}
-            </p>
-          </div>
-
-          {/* Interests */}
-          <div className="w-full text-center">
-            <p className="text-[10px] text-slate-400 mb-0.5">관심분야</p>
-            <p className="text-sm font-semibold text-primary-600 truncate">
+            </Typography>
+          </Box>
+          <Box sx={{ width: '100%', textAlign: 'center' }}>
+            <Typography variant="caption" sx={{ color: 'text.disabled' }}>관심분야</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {member.interests && member.interests.length > 0
                 ? member.interests.slice(0, 2).join(', ')
                 : '미등록'}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Typography>
+          </Box>
+        </Paper>
+      </Box>
+    </Box>
   )
 }

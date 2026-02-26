@@ -1,8 +1,11 @@
-import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react'
+import { useState, useCallback, createContext, useContext, ReactNode } from 'react'
+import Snackbar from '@mui/material/Snackbar'
+import Alert from '@mui/material/Alert'
+import type { AlertColor } from '@mui/material/Alert'
 
 type ToastType = 'success' | 'error' | 'info'
 
-interface Toast {
+interface ToastData {
   id: string
   message: string
   type: ToastType
@@ -22,8 +25,14 @@ export function useToast() {
   return context
 }
 
+const toastTypeToSeverity: Record<ToastType, AlertColor> = {
+  success: 'success',
+  error: 'error',
+  info: 'info',
+}
+
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([])
+  const [toasts, setToasts] = useState<ToastData[]>([])
 
   const showToast = useCallback((message: string, type: ToastType = 'info') => {
     const id = crypto.randomUUID()
@@ -37,49 +46,24 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2" aria-live="polite">
-        {toasts.map((toast) => (
-          <ToastItem key={toast.id} toast={toast} onDismiss={() => removeToast(toast.id)} />
-        ))}
-      </div>
+      {toasts.map((toast) => (
+        <Snackbar
+          key={toast.id}
+          open
+          autoHideDuration={3000}
+          onClose={() => removeToast(toast.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            onClose={() => removeToast(toast.id)}
+            severity={toastTypeToSeverity[toast.type]}
+            variant="filled"
+            sx={{ width: '100%', minWidth: 250 }}
+          >
+            {toast.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </ToastContext.Provider>
-  )
-}
-
-function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }) {
-  useEffect(() => {
-    const timer = setTimeout(onDismiss, 3000)
-    return () => clearTimeout(timer)
-  }, [onDismiss])
-
-  const styles = {
-    success: 'bg-green-500 text-white',
-    error: 'bg-red-500 text-white',
-    info: 'bg-primary-500 text-white',
-  }
-
-  const icons = {
-    success: '✓',
-    error: '✕',
-    info: 'ℹ',
-  }
-
-  return (
-    <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium animate-fade-in min-w-[250px] ${styles[toast.type]}`}
-      role="alert"
-    >
-      <span className="text-base">{icons[toast.type]}</span>
-      <span className="flex-1">{toast.message}</span>
-      <button
-        onClick={onDismiss}
-        className="opacity-70 hover:opacity-100 transition-opacity"
-        aria-label="알림 닫기"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
   )
 }

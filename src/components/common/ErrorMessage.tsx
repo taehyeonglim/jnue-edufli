@@ -1,3 +1,8 @@
+import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
+
 interface ErrorMessageProps {
   message: string
   onRetry?: () => void
@@ -5,14 +10,18 @@ interface ErrorMessageProps {
 
 export default function ErrorMessage({ message, onRetry }: ErrorMessageProps) {
   return (
-    <div className="card text-center py-12" role="alert">
-      <div className="text-5xl mb-4">⚠️</div>
-      <p className="text-slate-500 mb-4">{message}</p>
+    <Paper sx={{ textAlign: 'center', py: 6, px: 3 }} role="alert">
+      <Typography sx={{ fontSize: '3rem', mb: 2 }}>⚠️</Typography>
+      <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
+        {message}
+      </Typography>
       {onRetry && (
-        <button onClick={onRetry} className="btn btn-primary btn-sm">
-          다시 시도
-        </button>
+        <Box>
+          <Button variant="contained" size="small" onClick={onRetry}>
+            다시 시도
+          </Button>
+        </Box>
       )}
-    </div>
+    </Paper>
   )
 }

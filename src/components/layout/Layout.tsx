@@ -1,17 +1,18 @@
 import { Outlet } from 'react-router-dom'
+import Box from '@mui/material/Box'
 import Header from './Header'
 import Footer from './Footer'
 import OnlineUsers from '../common/OnlineUsers'
 
 export default function Layout() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Header />
-      <main className="flex-1">
+      <Box component="main" sx={{ flex: 1 }}>
         <Outlet />
-      </main>
+      </Box>
       <Footer />
       <OnlineUsers />
-    </div>
+    </Box>
   )
 }

@@ -1,5 +1,14 @@
 import { memo } from 'react'
 import { Link } from 'react-router-dom'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Avatar from '@mui/material/Avatar'
+import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack'
+import CardActionArea from '@mui/material/CardActionArea'
+import ImageIcon from '@mui/icons-material/Image'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline'
 import { Post, TIER_INFO } from '../../types'
 
 interface PostItemProps {
@@ -11,53 +20,78 @@ const PostItem = memo(function PostItem({ post, isLast }: PostItemProps) {
   const tierInfo = TIER_INFO[post.authorTier] || TIER_INFO.bronze
 
   return (
-    <Link
+    <CardActionArea
+      component={Link}
       to={`/post/${post.id}`}
-      className={`list-item gap-4 ${!isLast ? '' : 'border-b-0'}`}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        px: 3,
+        py: 2,
+        borderBottom: isLast ? 'none' : 1,
+        borderColor: 'divider',
+        borderRadius: 0,
+      }}
     >
-      <img
-        src={post.authorPhotoURL || '/default-avatar.svg'}
+      <Avatar
+        src={post.authorPhotoURL || undefined}
         alt={`${post.authorName} 프로필`}
-        className="avatar avatar-md"
-        style={{ borderColor: tierInfo.color }}
+        sx={{ width: 44, height: 44, borderColor: tierInfo.color }}
       />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <h3 className="font-medium text-slate-900 truncate hover:text-primary-600 transition-colors">
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: 'text.primary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
             {post.title}
-          </h3>
-          {post.imageURL && (
-            <svg className="w-4 h-4 text-primary-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          )}
-        </div>
-        <p className="text-sm text-slate-500 truncate mb-2">{post.content}</p>
-        <div className="flex items-center gap-4 text-xs text-slate-500">
-          <span className="flex items-center gap-1">
-            <span>{post.authorName}</span>
-            <span style={{ color: tierInfo.color }} aria-label={tierInfo.name}>{tierInfo.emoji}</span>
-          </span>
-          <span>{post.createdAt.toLocaleDateString('ko-KR')}</span>
-        </div>
-      </div>
+          </Typography>
+          {post.imageURL && <ImageIcon sx={{ fontSize: 16, color: 'primary.main', flexShrink: 0 }} />}
+        </Stack>
+        <Typography
+          variant="caption"
+          sx={{ color: 'text.secondary', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', mb: 0.5 }}
+        >
+          {post.content}
+        </Typography>
+        <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            {post.authorName}
+          </Typography>
+          <Typography variant="caption" sx={{ color: tierInfo.color }}>
+            {tierInfo.emoji}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+            {post.createdAt.toLocaleDateString('ko-KR')}
+          </Typography>
+        </Stack>
+      </Box>
       {post.imageURL && (
-        <img
+        <Box
+          component="img"
           src={post.imageURL}
           alt={`${post.title} 썸네일`}
-          className="w-16 h-16 object-cover rounded border border-slate-200 shrink-0"
           loading="lazy"
+          sx={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 1.5, flexShrink: 0, border: 1, borderColor: 'divider' }}
         />
       )}
-      <div className="flex items-center gap-2 text-sm shrink-0">
-        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 text-red-400 text-xs font-semibold">
-          ♥ {post.likes.length}
-        </span>
-        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold">
-          💬 {post.comments.length}
-        </span>
-      </div>
-    </Link>
+      <Stack direction="row" spacing={0.75} sx={{ flexShrink: 0 }}>
+        <Chip
+          icon={<FavoriteIcon sx={{ fontSize: 14 }} />}
+          label={post.likes.length}
+          size="small"
+          sx={{ bgcolor: 'error.50', color: 'error.main', fontSize: '0.75rem', '& .MuiChip-icon': { color: 'error.light' } }}
+        />
+        <Chip
+          icon={<ChatBubbleOutlineIcon sx={{ fontSize: 14 }} />}
+          label={post.comments.length}
+          size="small"
+          variant="outlined"
+          sx={{ fontSize: '0.75rem' }}
+        />
+      </Stack>
+    </CardActionArea>
   )
 })
 

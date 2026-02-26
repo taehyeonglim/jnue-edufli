@@ -7,6 +7,16 @@ import ErrorMessage from '../components/common/ErrorMessage'
 import SendMessageModal from '../components/common/SendMessageModal'
 import { useAuth } from '../contexts/AuthContext'
 import { getNextTier } from '../utils/helpers'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Paper from '@mui/material/Paper'
+import Avatar from '@mui/material/Avatar'
+import Stack from '@mui/material/Stack'
+import LinearProgress from '@mui/material/LinearProgress'
+import IconButton from '@mui/material/IconButton'
+import MailOutlineIcon from '@mui/icons-material/MailOutline'
+import TierBadge from '../components/common/TierBadge'
 
 export default function Ranking() {
   const { currentUser } = useAuth()
@@ -40,7 +50,6 @@ export default function Ranking() {
         })
       setUsers(usersData)
     } catch {
-      // isTestAccount 필드가 없는 문서가 있을 수 있으므로 fallback
       try {
         const q = query(
           collection(db, 'users'),
@@ -78,148 +87,166 @@ export default function Ranking() {
     : 0
 
   return (
-    <div>
+    <Box>
       {/* Page Header */}
-      <div className="page-header">
-        <div className="container">
-          <h1 className="page-title">랭킹</h1>
-          <p className="page-desc">동아리원들의 활동 랭킹을 확인하세요</p>
-        </div>
-      </div>
+      <Box sx={{ py: 5, textAlign: 'center' }}>
+        <Container maxWidth="lg">
+          <Typography variant="h3" sx={{ fontWeight: 800 }}>랭킹</Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary', mt: 1 }}>동아리원들의 활동 랭킹을 확인하세요</Typography>
+        </Container>
+      </Box>
 
-      <div className="section">
-        <div className="container-sm">
-          {/* Current User Card */}
-          {currentUser && (
-            <div className="card p-5 mb-6">
-              <div className="flex items-center gap-4">
-                <div className="relative shrink-0">
-                  <img
-                    src={currentUser.photoURL || '/default-avatar.svg'}
-                    alt={currentUser.displayName}
-                    className="avatar avatar-lg"
-                    style={{ borderColor: TIER_INFO[currentUser.tier].color }}
-                  />
-                  <div
-                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-sm"
-                    style={{ backgroundColor: TIER_INFO[currentUser.tier].color }}
-                  >
-                    {TIER_INFO[currentUser.tier].emoji}
-                  </div>
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="font-semibold text-slate-900 truncate">
-                      {currentUser.nickname || currentUser.displayName}
-                    </span>
-                    <span
-                      className="text-xs font-medium px-2 py-0.5 rounded"
-                      style={{
-                        backgroundColor: `${TIER_INFO[currentUser.tier].color}20`,
-                        color: TIER_INFO[currentUser.tier].color,
-                      }}
-                    >
-                      {TIER_INFO[currentUser.tier].emoji} {TIER_INFO[currentUser.tier].name}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl font-bold text-primary-600">{currentUser.points}P</span>
-                    {(() => {
-                      const nextTierInfo = getNextTier(currentUser.tier, currentUser.points)
-                      if (nextTierInfo) {
-                        return (
-                          <span className="text-xs text-slate-500">
-                            {TIER_INFO[nextTierInfo.tier].emoji} {nextTierInfo.pointsNeeded}P 남음
-                          </span>
-                        )
-                      }
-                      return null
-                    })()}
-                  </div>
-                </div>
-
-                <div className="text-center px-4 shrink-0">
-                  <p className="text-xs text-slate-500 mb-1">내 순위</p>
-                  <p className="text-2xl font-bold text-primary-600">
-                    #{currentUserRank || '-'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              {(() => {
-                const nextTierInfo = getNextTier(currentUser.tier, currentUser.points)
-                if (!nextTierInfo) return null
-
-                const currentMin = TIER_THRESHOLDS[currentUser.tier].min
-                const nextMin = TIER_THRESHOLDS[nextTierInfo.tier].min
-                const progress = ((currentUser.points - currentMin) / (nextMin - currentMin)) * 100
-
-                return (
-                  <div className="mt-4">
-                    <div className="flex justify-between text-xs text-slate-500 mb-1.5">
-                      <span className="flex items-center gap-1">
-                        <span>{TIER_INFO[currentUser.tier].emoji}</span>
-                        <span>{TIER_INFO[currentUser.tier].name}</span>
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span>{TIER_INFO[nextTierInfo.tier].emoji}</span>
-                        <span>{TIER_INFO[nextTierInfo.tier].name}</span>
-                      </span>
-                    </div>
-                    <div className="progress">
-                      <div
-                        className="progress-fill"
-                        style={{ width: `${Math.min(progress, 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                )
-              })()}
-            </div>
-          )}
-
-          {/* Tier Legend */}
-          <div className="card p-6 mb-6">
-            <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-4">티어 기준</h3>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-              {(['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master'] as TierType[]).map((tier) => (
-                <div
-                  key={tier}
-                  className="flex items-center gap-2 px-3 py-2.5 bg-slate-50 rounded-lg border border-slate-200"
+      <Container maxWidth="md" sx={{ pb: 6 }}>
+        {/* Current User Card */}
+        {currentUser && (
+          <Paper sx={{ p: 3, mb: 3 }}>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Box sx={{ position: 'relative', flexShrink: 0 }}>
+                <Avatar
+                  src={currentUser.photoURL || undefined}
+                  alt={currentUser.displayName}
+                  sx={{ width: 60, height: 60, borderColor: TIER_INFO[currentUser.tier].color }}
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: -4,
+                    right: -4,
+                    width: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.875rem',
+                    bgcolor: TIER_INFO[currentUser.tier].color,
+                  }}
                 >
-                  <span className="text-base">{TIER_INFO[tier].emoji}</span>
-                  <span className="text-sm font-medium" style={{ color: TIER_INFO[tier].color }}>
-                    {TIER_THRESHOLDS[tier].min}P+
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+                  {TIER_INFO[currentUser.tier].emoji}
+                </Box>
+              </Box>
 
-          {/* Error State */}
-          {error && <ErrorMessage message={error} onRetry={loadRanking} />}
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" sx={{ mb: 0.5 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                    {currentUser.nickname || currentUser.displayName}
+                  </Typography>
+                  <TierBadge tier={currentUser.tier} showName />
+                </Stack>
+                <Stack direction="row" alignItems="center" spacing={1.5}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                    {currentUser.points}P
+                  </Typography>
+                  {(() => {
+                    const nextTierInfo = getNextTier(currentUser.tier, currentUser.points)
+                    if (nextTierInfo) {
+                      return (
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                          {TIER_INFO[nextTierInfo.tier].emoji} {nextTierInfo.pointsNeeded}P 남음
+                        </Typography>
+                      )
+                    }
+                    return null
+                  })()}
+                </Stack>
+              </Box>
 
-          {/* Ranking List */}
-          {!error && <div className="card overflow-hidden">
+              <Box sx={{ textAlign: 'center', px: 2, flexShrink: 0 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>내 순위</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                  #{currentUserRank || '-'}
+                </Typography>
+              </Box>
+            </Stack>
+
+            {/* Progress Bar */}
+            {(() => {
+              const nextTierInfo = getNextTier(currentUser.tier, currentUser.points)
+              if (!nextTierInfo) return null
+
+              const currentMin = TIER_THRESHOLDS[currentUser.tier].min
+              const nextMin = TIER_THRESHOLDS[nextTierInfo.tier].min
+              const progress = ((currentUser.points - currentMin) / (nextMin - currentMin)) * 100
+
+              return (
+                <Box sx={{ mt: 2.5 }}>
+                  <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      {TIER_INFO[currentUser.tier].emoji} {TIER_INFO[currentUser.tier].name}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      {TIER_INFO[nextTierInfo.tier].emoji} {TIER_INFO[nextTierInfo.tier].name}
+                    </Typography>
+                  </Stack>
+                  <LinearProgress
+                    variant="determinate"
+                    value={Math.min(progress, 100)}
+                    sx={{
+                      bgcolor: `${TIER_INFO[currentUser.tier].color}20`,
+                      '& .MuiLinearProgress-bar': {
+                        bgcolor: TIER_INFO[currentUser.tier].color,
+                      },
+                    }}
+                  />
+                </Box>
+              )
+            })()}
+          </Paper>
+        )}
+
+        {/* Tier Legend */}
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, mb: 2, display: 'block' }}>
+            티어 기준
+          </Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(3, 1fr)', sm: 'repeat(6, 1fr)' }, gap: 1.5 }}>
+            {(['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master'] as TierType[]).map((tier) => (
+              <Paper
+                key={tier}
+                variant="outlined"
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.5, py: 1.5 }}
+              >
+                <Typography sx={{ fontSize: '1rem' }}>{TIER_INFO[tier].emoji}</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: TIER_INFO[tier].color }}>
+                  {TIER_THRESHOLDS[tier].min}P+
+                </Typography>
+              </Paper>
+            ))}
+          </Box>
+        </Paper>
+
+        {/* Error State */}
+        {error && <ErrorMessage message={error} onRetry={loadRanking} />}
+
+        {/* Ranking List */}
+        {!error && (
+          <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
             {/* Header */}
-            <div
-              className="hidden sm:grid grid-cols-[3rem_1fr_auto_6rem] gap-4 px-6 py-5 bg-slate-50 text-xs font-medium text-slate-500 uppercase tracking-wide border-b border-slate-200"
+            <Box
+              sx={{
+                display: { xs: 'none', sm: 'grid' },
+                gridTemplateColumns: '3rem 1fr auto 6rem',
+                gap: 2,
+                px: 3,
+                py: 2,
+                bgcolor: 'action.hover',
+                borderBottom: 1,
+                borderColor: 'divider',
+              }}
             >
-              <span className="text-center">#</span>
-              <span>유저</span>
-              <span className="text-center">티어</span>
-              <span className="text-right">포인트</span>
-            </div>
+              <Typography variant="caption" sx={{ textAlign: 'center', fontWeight: 600, textTransform: 'uppercase', color: 'text.secondary' }}>#</Typography>
+              <Typography variant="caption" sx={{ fontWeight: 600, textTransform: 'uppercase', color: 'text.secondary' }}>유저</Typography>
+              <Typography variant="caption" sx={{ textAlign: 'center', fontWeight: 600, textTransform: 'uppercase', color: 'text.secondary' }}>티어</Typography>
+              <Typography variant="caption" sx={{ textAlign: 'right', fontWeight: 600, textTransform: 'uppercase', color: 'text.secondary' }}>포인트</Typography>
+            </Box>
 
             {users.length === 0 ? (
-              <div className="py-12 text-center">
-                <div className="text-5xl mb-4">🏆</div>
-                <p className="text-slate-500">아직 랭킹 데이터가 없습니다</p>
-              </div>
+              <Box sx={{ py: 6, textAlign: 'center' }}>
+                <Typography sx={{ fontSize: '3rem', mb: 2 }}>🏆</Typography>
+                <Typography variant="body1" sx={{ color: 'text.secondary' }}>아직 랭킹 데이터가 없습니다</Typography>
+              </Box>
             ) : (
-              <div>
+              <Box>
                 {users.map((user, index) => (
                   <RankingRow
                     key={user.uid}
@@ -230,11 +257,11 @@ export default function Ranking() {
                     onMessage={() => setMessageTarget(user)}
                   />
                 ))}
-              </div>
+              </Box>
             )}
-          </div>}
-        </div>
-      </div>
+          </Paper>
+        )}
+      </Container>
 
       {/* Send Message Modal */}
       {messageTarget && (
@@ -244,7 +271,7 @@ export default function Ranking() {
           onSuccess={() => alert('쪽지를 보냈습니다!')}
         />
       )}
-    </div>
+    </Box>
   )
 }
 
@@ -262,87 +289,108 @@ const RankingRow = memo(function RankingRow({
   onMessage: () => void
 }) {
   const getRankDisplay = () => {
-    if (rank === 1) return { emoji: '🥇', className: 'text-yellow-400 font-bold text-lg' }
-    if (rank === 2) return { emoji: '🥈', className: 'text-slate-300 font-bold' }
-    if (rank === 3) return { emoji: '🥉', className: 'text-amber-600 font-bold' }
-    return { emoji: String(rank), className: 'text-slate-500' }
+    if (rank === 1) return '🥇'
+    if (rank === 2) return '🥈'
+    if (rank === 3) return '🥉'
+    return String(rank)
   }
 
-  const rankDisplay = getRankDisplay()
   const displayName = user.nickname || user.displayName
   const tierInfo = TIER_INFO[user.tier] || TIER_INFO.bronze
 
-  const rowClass = rank === 1
-    ? 'bg-gradient-to-r from-yellow-50/80 to-amber-50/50 border-l-4 border-l-yellow-400'
-    : rank === 2
-    ? 'bg-gradient-to-r from-slate-50/80 to-gray-50/50 border-l-4 border-l-slate-400'
-    : rank === 3
-    ? 'bg-gradient-to-r from-orange-50/80 to-amber-50/50 border-l-4 border-l-orange-400'
-    : isCurrentUser
-    ? 'bg-primary-50/80 border-l-4 border-l-primary-400'
-    : 'hover:bg-slate-50/80'
-
   return (
-    <div
-      className={`flex items-center gap-3 sm:grid sm:grid-cols-[3rem_1fr_auto_6rem] sm:gap-4 px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 transition-colors ${rowClass}`}
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        px: { xs: 2, sm: 3 },
+        py: { xs: 2, sm: 2.5 },
+        borderBottom: 1,
+        borderColor: 'divider',
+        bgcolor: rank === 1
+          ? 'rgba(253, 224, 71, 0.08)'
+          : rank === 2
+          ? 'rgba(148, 163, 184, 0.06)'
+          : rank === 3
+          ? 'rgba(251, 146, 60, 0.06)'
+          : isCurrentUser
+          ? 'primary.50'
+          : 'transparent',
+        borderLeft: rank <= 3 || isCurrentUser ? 4 : 0,
+        borderLeftColor: rank === 1
+          ? 'warning.main'
+          : rank === 2
+          ? 'grey.400'
+          : rank === 3
+          ? 'warning.dark'
+          : isCurrentUser
+          ? 'primary.main'
+          : 'transparent',
+        '&:hover': { bgcolor: isCurrentUser ? 'primary.50' : 'action.hover' },
+        transition: 'background-color 0.2s',
+      }}
     >
-      <span className={`text-center shrink-0 w-8 sm:w-auto ${rankDisplay.className}`}>
-        {rankDisplay.emoji}
-      </span>
+      <Typography
+        sx={{
+          width: 32,
+          textAlign: 'center',
+          flexShrink: 0,
+          fontWeight: rank <= 3 ? 700 : 400,
+          fontSize: rank <= 3 ? '1.125rem' : '0.875rem',
+          color: rank <= 3 ? tierInfo.color : 'text.secondary',
+        }}
+      >
+        {getRankDisplay()}
+      </Typography>
 
-      <div className="flex items-center gap-3 min-w-0 flex-1">
-        <img
-          src={user.photoURL || '/default-avatar.svg'}
+      <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flex: 1, minWidth: 0 }}>
+        <Avatar
+          src={user.photoURL || undefined}
           alt={displayName}
-          className="avatar avatar-sm"
-          style={{ borderColor: tierInfo.color }}
+          sx={{ width: 36, height: 36, borderColor: tierInfo.color }}
         />
-        <div className="min-w-0">
-          <span className={`font-medium truncate block ${isCurrentUser ? 'text-primary-600' : 'text-slate-900'}`}>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: isCurrentUser ? 'primary.main' : 'text.primary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {displayName}
-            {isCurrentUser && <span className="ml-1.5 text-xs text-accent-500">(나)</span>}
-          </span>
-          <span
-            className="sm:hidden text-xs font-medium"
-            style={{ color: tierInfo.color }}
-          >
+            {isCurrentUser && <Typography component="span" variant="caption" sx={{ color: 'secondary.main', ml: 0.75 }}>(나)</Typography>}
+          </Typography>
+          <Typography variant="caption" sx={{ display: { xs: 'block', sm: 'none' }, color: tierInfo.color, fontWeight: 500 }}>
             {tierInfo.emoji} {tierInfo.name}
-          </span>
-        </div>
-      </div>
+          </Typography>
+        </Box>
+      </Stack>
 
-      <div className="hidden sm:flex items-center">
-        <span
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
-          style={{ backgroundColor: `${tierInfo.color}20`, color: tierInfo.color }}
-        >
-          {tierInfo.emoji} {tierInfo.name}
-        </span>
-      </div>
+      <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+        <TierBadge tier={user.tier} showName />
+      </Box>
 
-      <div className="flex items-center gap-2 shrink-0">
-        <span
-          className={`font-bold ${rank <= 3 ? 'text-lg' : ''}`}
-          style={rank <= 3 ? { color: tierInfo.color } : { color: '#4F46E5' }}
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ flexShrink: 0 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 700,
+            fontSize: rank <= 3 ? '1rem' : '0.875rem',
+            color: rank <= 3 ? tierInfo.color : 'primary.main',
+          }}
         >
           {user.points}P
-        </span>
+        </Typography>
         {canMessage && (
-          <button
+          <IconButton
+            size="small"
             onClick={(e) => {
               e.stopPropagation()
               onMessage()
             }}
-            className="p-1.5 text-slate-500 hover:text-primary-600 hover:bg-slate-100 rounded transition-colors"
             title="쪽지 보내기"
             aria-label={`${displayName}에게 쪽지 보내기`}
+            sx={{ color: 'text.disabled', '&:hover': { color: 'primary.main' } }}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-          </button>
+            <MailOutlineIcon fontSize="small" />
+          </IconButton>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Box>
   )
 })

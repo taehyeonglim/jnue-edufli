@@ -1,4 +1,5 @@
 import { Navigate } from 'react-router-dom'
+import Box from '@mui/material/Box'
 import { useAuth } from '../../contexts/AuthContext'
 import LoadingSpinner from './LoadingSpinner'
 
@@ -12,9 +13,9 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <LoadingSpinner />
-      </div>
+      </Box>
     )
   }
 

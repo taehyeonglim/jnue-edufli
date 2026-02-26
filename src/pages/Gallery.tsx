@@ -6,6 +6,22 @@ import LoadingSpinner from '../components/common/LoadingSpinner'
 import ErrorMessage from '../components/common/ErrorMessage'
 import { useImageUpload } from '../hooks/useImageUpload'
 
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import Paper from '@mui/material/Paper'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import TextField from '@mui/material/TextField'
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
+import CloseIcon from '@mui/icons-material/Close'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import ImageIcon from '@mui/icons-material/Image'
+
 export default function Gallery() {
   const { currentUser } = useAuth()
   const [images, setImages] = useState<GalleryImage[]>([])
@@ -114,30 +130,32 @@ export default function Gallery() {
   }
 
   return (
-    <div>
+    <Box>
       {/* Page Header */}
-      <div className="page-header">
-        <div className="container">
-          <h1 className="page-title">갤러리</h1>
-          <p className="page-desc">동아리 활동 사진을 공유하세요</p>
-        </div>
-      </div>
+      <Box sx={{ py: 5, textAlign: 'center', bgcolor: 'background.default' }}>
+        <Container maxWidth="lg">
+          <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>
+            갤러리
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+            동아리 활동 사진을 공유하세요
+          </Typography>
+        </Container>
+      </Box>
 
-      <div className="section">
-        <div className="container">
+      <Box sx={{ py: 4 }}>
+        <Container maxWidth="lg">
           {/* Upload Button */}
           {currentUser && (
-            <div className="mb-6 flex justify-end">
-              <button
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="contained"
+                startIcon={<AddPhotoAlternateIcon />}
                 onClick={() => setShowUploadModal(true)}
-                className="btn btn-primary flex items-center gap-2"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
                 사진 업로드
-              </button>
-            </div>
+              </Button>
+            </Box>
           )}
 
           {/* Error State */}
@@ -145,204 +163,323 @@ export default function Gallery() {
 
           {/* Gallery Grid */}
           {!error && images.length === 0 ? (
-            <div className="card p-12 text-center">
-              <div className="text-5xl mb-4">📷</div>
-              <p className="text-slate-500 mb-2">아직 등록된 사진이 없습니다</p>
+            <Paper sx={{ p: 6, textAlign: 'center' }}>
+              <ImageIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+              <Typography sx={{ color: 'text.secondary', mb: 1 }}>
+                아직 등록된 사진이 없습니다
+              </Typography>
               {currentUser && (
-                <p className="text-sm text-slate-400">첫 번째 사진을 업로드해보세요!</p>
+                <Typography variant="body2" sx={{ color: 'text.disabled' }}>
+                  첫 번째 사진을 업로드해보세요!
+                </Typography>
               )}
-            </div>
+            </Paper>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                  lg: 'repeat(4, 1fr)',
+                },
+                gap: 2,
+              }}
+            >
               {images.map((image) => (
-                <div
+                <Box
                   key={image.id}
-                  className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer bg-slate-100 shadow-sm hover:shadow-lg transition-shadow"
                   onClick={() => setSelectedImage(image)}
+                  sx={{
+                    position: 'relative',
+                    aspectRatio: '1 / 1',
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    bgcolor: 'grey.100',
+                    boxShadow: 1,
+                    transition: 'box-shadow 0.3s',
+                    '&:hover': {
+                      boxShadow: 6,
+                    },
+                    '&:hover img': {
+                      transform: 'scale(1.05)',
+                    },
+                    '&:hover .overlay': {
+                      opacity: 1,
+                    },
+                  }}
                 >
-                  <img
+                  <Box
+                    component="img"
                     src={image.imageURL}
                     alt={image.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.3s',
+                    }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="absolute bottom-0 left-0 right-0 p-3">
-                      <p className="text-white font-medium text-sm truncate">{image.title}</p>
-                      <p className="text-white/70 text-xs">{image.uploadedByName}</p>
-                    </div>
-                  </div>
-                </div>
+                  <Box
+                    className="overlay"
+                    sx={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)',
+                      opacity: 0,
+                      transition: 'opacity 0.3s',
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                    }}
+                  >
+                    <Box sx={{ p: 1.5, width: '100%' }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'white',
+                          fontWeight: 500,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {image.title}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                        {image.uploadedByName}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
               ))}
-            </div>
+            </Box>
           )}
-        </div>
-      </div>
+        </Container>
+      </Box>
 
       {/* Upload Modal */}
-      {showUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-label="사진 업로드">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl">
-            <div className="flex items-center justify-between p-6 border-b border-slate-200">
-              <h3 className="text-lg font-semibold text-slate-900">사진 업로드</h3>
-              <button
-                onClick={closeUploadModal}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-                aria-label="업로드 모달 닫기"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+      <Dialog open={showUploadModal} onClose={closeUploadModal} maxWidth="sm" fullWidth>
+        <DialogTitle>사진 업로드</DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+            {/* File Input */}
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
+                사진 선택
+              </Typography>
+              {uploadImageError && (
+                <Typography variant="body2" sx={{ color: 'error.main', mb: 1 }} role="alert">
+                  {uploadImageError}
+                </Typography>
+              )}
+              {previewUrl ? (
+                <Box sx={{ position: 'relative' }}>
+                  <Box
+                    component="img"
+                    src={previewUrl}
+                    alt="업로드 미리보기"
+                    sx={{
+                      width: '100%',
+                      height: 192,
+                      objectFit: 'cover',
+                      borderRadius: 2,
+                    }}
+                  />
+                  <IconButton
+                    onClick={resetUploadPreview}
+                    aria-label="선택한 이미지 제거"
+                    size="small"
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      bgcolor: 'rgba(0,0,0,0.5)',
+                      color: 'white',
+                      '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' },
+                    }}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              ) : (
+                <Box
+                  component="label"
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%',
+                    height: 192,
+                    border: '2px dashed',
+                    borderColor: 'grey.300',
+                    borderRadius: 2,
+                    cursor: 'pointer',
+                    transition: 'border-color 0.2s, background-color 0.2s',
+                    '&:hover': {
+                      borderColor: 'primary.light',
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <ImageIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    클릭하여 사진 선택
+                  </Typography>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    hidden
+                  />
+                </Box>
+              )}
+            </Box>
 
-            <div className="space-y-5 p-6">
-              {/* File Input */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">사진 선택</label>
-                {uploadImageError && (
-                  <p className="text-sm text-red-500 mb-2" role="alert">{uploadImageError}</p>
-                )}
-                {previewUrl ? (
-                  <div className="relative">
-                    <img
-                      src={previewUrl}
-                      alt="업로드 미리보기"
-                      className="w-full h-48 object-cover rounded-lg"
-                    />
-                    <button
-                      onClick={resetUploadPreview}
-                      className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
-                      aria-label="선택한 이미지 제거"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-primary-300 hover:bg-primary-50/50 transition-colors">
-                    <svg className="w-10 h-10 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-sm text-slate-500">클릭하여 사진 선택</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
-                )}
-              </div>
+            {/* Title */}
+            <TextField
+              label="제목"
+              value={uploadTitle}
+              onChange={(e) => setUploadTitle(e.target.value)}
+              placeholder="사진 제목을 입력하세요"
+              fullWidth
+              inputProps={{ maxLength: 50 }}
+            />
 
-              {/* Title */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">제목</label>
-                <input
-                  type="text"
-                  value={uploadTitle}
-                  onChange={(e) => setUploadTitle(e.target.value)}
-                  placeholder="사진 제목을 입력하세요"
-                  className="input"
-                  maxLength={50}
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">설명 (선택)</label>
-                <textarea
-                  value={uploadDescription}
-                  onChange={(e) => setUploadDescription(e.target.value)}
-                  placeholder="사진에 대한 설명을 입력하세요"
-                  className="input min-h-[80px] resize-none"
-                  maxLength={200}
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3 p-6 border-t border-slate-200">
-              <button
-                onClick={closeUploadModal}
-                className="btn btn-secondary flex-1"
-                disabled={uploading}
-              >
-                취소
-              </button>
-              <button
-                onClick={handleUpload}
-                disabled={!uploadFile || !uploadTitle.trim() || uploading}
-                className="btn btn-primary flex-1"
-              >
-                {uploading ? '업로드 중...' : '업로드'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            {/* Description */}
+            <TextField
+              label="설명 (선택)"
+              value={uploadDescription}
+              onChange={(e) => setUploadDescription(e.target.value)}
+              placeholder="사진에 대한 설명을 입력하세요"
+              fullWidth
+              multiline
+              minRows={3}
+              inputProps={{ maxLength: 200 }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeUploadModal} disabled={uploading}>
+            취소
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleUpload}
+            disabled={!uploadFile || !uploadTitle.trim() || uploading}
+          >
+            {uploading ? '업로드 중...' : '업로드'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Lightbox Modal */}
       {selectedImage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
+        <Box
           onClick={() => setSelectedImage(null)}
           role="dialog"
           aria-modal="true"
           aria-label={selectedImage.title}
+          sx={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 50,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 2,
+            bgcolor: 'rgba(0,0,0,0.9)',
+          }}
         >
-          <div
-            className="relative max-w-4xl w-full"
+          <Box
             onClick={(e) => e.stopPropagation()}
+            sx={{ position: 'relative', maxWidth: 900, width: '100%' }}
           >
             {/* Close Button */}
-            <button
+            <IconButton
               onClick={() => setSelectedImage(null)}
-              className="absolute top-2 right-2 sm:-top-12 sm:right-0 p-2 bg-black/50 sm:bg-transparent text-white/70 hover:text-white rounded-full sm:rounded-none transition-colors z-10"
               aria-label="이미지 뷰어 닫기"
+              sx={{
+                position: 'absolute',
+                top: { xs: 8, sm: -48 },
+                right: { xs: 8, sm: 0 },
+                color: 'rgba(255,255,255,0.7)',
+                bgcolor: { xs: 'rgba(0,0,0,0.5)', sm: 'transparent' },
+                zIndex: 10,
+                '&:hover': { color: 'white' },
+              }}
             >
-              <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              <CloseIcon sx={{ fontSize: { xs: 24, sm: 32 } }} />
+            </IconButton>
 
             {/* Image */}
-            <img
+            <Box
+              component="img"
               src={selectedImage.imageURL}
               alt={selectedImage.title}
-              className="w-full max-h-[70vh] object-contain rounded-lg"
+              sx={{
+                width: '100%',
+                maxHeight: '70vh',
+                objectFit: 'contain',
+                borderRadius: 2,
+              }}
             />
 
             {/* Info */}
-            <div className="mt-4 text-white">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="text-xl font-semibold">{selectedImage.title}</h3>
+            <Box sx={{ mt: 2, color: 'white' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                }}
+              >
+                <Box>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    {selectedImage.title}
+                  </Typography>
                   {selectedImage.description && (
-                    <p className="text-white/70 mt-1">{selectedImage.description}</p>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: 'rgba(255,255,255,0.7)', mt: 0.5 }}
+                    >
+                      {selectedImage.description}
+                    </Typography>
                   )}
-                  <p className="text-white/50 text-sm mt-2">
-                    {selectedImage.uploadedByName} · {selectedImage.createdAt.toLocaleDateString('ko-KR')}
-                  </p>
-                </div>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'rgba(255,255,255,0.5)', mt: 1, display: 'block' }}
+                  >
+                    {selectedImage.uploadedByName} ·{' '}
+                    {selectedImage.createdAt.toLocaleDateString('ko-KR')}
+                  </Typography>
+                </Box>
 
                 {/* Delete Button */}
-                {currentUser && (currentUser.uid === selectedImage.uploadedBy || currentUser.isAdmin) && (
-                  <button
-                    onClick={() => handleDelete(selectedImage)}
-                    className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-colors"
-                    title="삭제"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+                {currentUser &&
+                  (currentUser.uid === selectedImage.uploadedBy || currentUser.isAdmin) && (
+                    <IconButton
+                      onClick={() => handleDelete(selectedImage)}
+                      title="삭제"
+                      sx={{
+                        color: 'error.light',
+                        '&:hover': {
+                          color: 'error.main',
+                          bgcolor: 'rgba(244,67,54,0.15)',
+                        },
+                      }}
+                    >
+                      <DeleteOutlineIcon />
+                    </IconButton>
+                  )}
+              </Box>
+            </Box>
+          </Box>
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }

@@ -8,17 +8,37 @@ import ErrorMessage from '../components/common/ErrorMessage'
 import { Navigate } from 'react-router-dom'
 import { adminAdjustPoints, adminSetRole, adminDeleteUser } from '../services/adminService'
 
-type Tab = 'users' | 'rewards' | 'challenger'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
+import TextField from '@mui/material/TextField'
+import InputAdornment from '@mui/material/InputAdornment'
+import Button from '@mui/material/Button'
+import Avatar from '@mui/material/Avatar'
+import Chip from '@mui/material/Chip'
+import MenuItem from '@mui/material/MenuItem'
+import Divider from '@mui/material/Divider'
+import SearchIcon from '@mui/icons-material/Search'
+import CheckIcon from '@mui/icons-material/Check'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
-const TAB_INFO: Record<Tab, { label: string; icon: string; description: string }> = {
+type TabKey = 'users' | 'rewards' | 'challenger'
+
+const TAB_INFO: Record<TabKey, { label: string; icon: string; description: string }> = {
   users: { label: '회원 관리', icon: '👥', description: '포인트 조정 및 관리자 권한 관리' },
   challenger: { label: '챌린저 지정', icon: '👑', description: '특별 챌린저 티어 부여' },
   rewards: { label: '상품 지급', icon: '🎁', description: '이벤트 상품 지급 및 내역 관리' },
 }
 
+const TAB_KEYS: TabKey[] = ['users', 'challenger', 'rewards']
+
 export default function Admin() {
   const { currentUser } = useAuth()
-  const [activeTab, setActiveTab] = useState<Tab>('users')
+  const [activeTab, setActiveTab] = useState<TabKey>('users')
   const [users, setUsers] = useState<User[]>([])
   const [rewards, setRewards] = useState<Reward[]>([])
   const [loading, setLoading] = useState(true)
@@ -74,50 +94,61 @@ export default function Admin() {
     return <LoadingSpinner />
   }
 
-  return (
-    <div>
-      {/* Page Header */}
-      <div className="page-header">
-        <div className="container">
-          <div className="flex items-center gap-3 justify-center mb-2">
-            <span className="text-3xl">⚙️</span>
-            <h1 className="page-title">관리자 페이지</h1>
-          </div>
-          <p className="page-desc">회원 관리, 챌린저 지정, 상품 지급을 관리합니다</p>
-        </div>
-      </div>
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(TAB_KEYS[newValue])
+  }
 
-      <div className="section">
-        <div className="container">
+  return (
+    <Box>
+      {/* Page Header */}
+      <Box sx={{ py: 5, textAlign: 'center' }}>
+        <Container maxWidth="lg">
+          <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="center" sx={{ mb: 1 }}>
+            <Typography sx={{ fontSize: '1.875rem' }}>⚙️</Typography>
+            <Typography variant="h3" sx={{ fontWeight: 800 }}>관리자 페이지</Typography>
+          </Stack>
+          <Typography variant="body2" color="text.secondary">
+            회원 관리, 챌린저 지정, 상품 지급을 관리합니다
+          </Typography>
+        </Container>
+      </Box>
+
+      <Box sx={{ py: 4 }}>
+        <Container maxWidth="lg">
           {error && <ErrorMessage message={error} onRetry={loadData} />}
 
           {/* Stats Overview */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', sm: '1fr 1fr 1fr 1fr' }, gap: 2, mb: 4 }}>
             <StatCard label="전체 회원" value={users.length} icon="👥" />
             <StatCard label="챌린저" value={users.filter(u => u.isChallenger).length} icon="👑" />
             <StatCard label="관리자" value={users.filter(u => u.isAdmin).length} icon="🛡️" />
             <StatCard label="상품 지급" value={rewards.length} icon="🎁" />
-          </div>
+          </Box>
 
           {/* Tabs */}
-          <div className="tabs mb-6">
-            {(Object.entries(TAB_INFO) as [Tab, typeof TAB_INFO[Tab]][]).map(([key, info]) => (
-              <button
+          <Tabs
+            value={TAB_KEYS.indexOf(activeTab)}
+            onChange={handleTabChange}
+            sx={{ mb: 3 }}
+          >
+            {TAB_KEYS.map((key) => (
+              <Tab
                 key={key}
-                onClick={() => setActiveTab(key)}
-                className={`tab ${activeTab === key ? 'tab-active' : ''}`}
-              >
-                <span className="text-lg">{info.icon}</span>
-                <span className="hidden sm:inline ml-2">{info.label}</span>
-              </button>
+                label={
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography sx={{ fontSize: '1.125rem' }}>{TAB_INFO[key].icon}</Typography>
+                    <Typography sx={{ display: { xs: 'none', sm: 'inline' } }}>{TAB_INFO[key].label}</Typography>
+                  </Stack>
+                }
+              />
             ))}
-          </div>
+          </Tabs>
 
           {/* Tab Description */}
-          <div className="flex items-center gap-2 mb-6 text-sm text-slate-500">
-            <span>{TAB_INFO[activeTab].icon}</span>
-            <span>{TAB_INFO[activeTab].description}</span>
-          </div>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
+            <Typography variant="body2" color="text.secondary">{TAB_INFO[activeTab].icon}</Typography>
+            <Typography variant="body2" color="text.secondary">{TAB_INFO[activeTab].description}</Typography>
+          </Stack>
 
           {/* Tab Content */}
           {activeTab === 'users' && (
@@ -134,23 +165,23 @@ export default function Admin() {
               onUpdate={loadData}
             />
           )}
-        </div>
-      </div>
-    </div>
+        </Container>
+      </Box>
+    </Box>
   )
 }
 
 function StatCard({ label, value, icon }: { label: string; value: number; icon: string }) {
   return (
-    <div className="card p-4">
-      <div className="flex items-center gap-3">
-        <span className="text-2xl">{icon}</span>
-        <div>
-          <p className="text-2xl font-bold text-primary-600">{value}</p>
-          <p className="text-xs text-slate-500">{label}</p>
-        </div>
-      </div>
-    </div>
+    <Paper sx={{ p: 3 }}>
+      <Stack direction="row" spacing={1.5} alignItems="center">
+        <Typography sx={{ fontSize: '1.5rem' }}>{icon}</Typography>
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>{value}</Typography>
+          <Typography variant="caption" color="text.secondary">{label}</Typography>
+        </Box>
+      </Stack>
+    </Paper>
   )
 }
 
@@ -249,146 +280,168 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
   }
 
   return (
-    <div className="space-y-4">
+    <Stack spacing={2}>
       {/* Search */}
-      <div className="card p-4">
-        <div className="relative">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="이름, 닉네임, 이메일로 검색..."
-            className="input pl-12"
-          />
-        </div>
-        <p className="text-xs text-slate-500 mt-2">
+      <Paper sx={{ p: 2 }}>
+        <TextField
+          fullWidth
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="이름, 닉네임, 이메일로 검색..."
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            },
+          }}
+          size="small"
+        />
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
           총 {filteredUsers.length}명의 회원
-        </p>
-      </div>
+        </Typography>
+      </Paper>
 
       {/* User List */}
-      <div className="card overflow-hidden">
-        <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto_auto_auto] gap-4 p-4 bg-slate-50 text-xs font-medium text-slate-500 uppercase tracking-wide border-b border-slate-200">
-          <span>유저</span>
-          <span className="w-24 text-center">티어</span>
-          <span className="w-20 text-right">포인트</span>
-          <span className="w-16 text-center">관리자</span>
-          <span className="w-12 text-center">테스트</span>
-          <span className="w-56 text-right">액션</span>
-        </div>
+      <Paper sx={{ overflow: 'hidden' }}>
+        {/* Header Row */}
+        <Box
+          sx={{
+            display: { xs: 'none', sm: 'grid' },
+            gridTemplateColumns: '1fr auto auto auto auto auto',
+            gap: 2,
+            p: 2,
+            bgcolor: 'grey.50',
+            borderBottom: 1,
+            borderColor: 'divider',
+          }}
+        >
+          <Typography variant="caption" sx={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary' }}>유저</Typography>
+          <Typography variant="caption" sx={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', width: 96, textAlign: 'center' }}>티어</Typography>
+          <Typography variant="caption" sx={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', width: 80, textAlign: 'right' }}>포인트</Typography>
+          <Typography variant="caption" sx={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', width: 64, textAlign: 'center' }}>관리자</Typography>
+          <Typography variant="caption" sx={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', width: 48, textAlign: 'center' }}>테스트</Typography>
+          <Typography variant="caption" sx={{ fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', width: 224, textAlign: 'right' }}>액션</Typography>
+        </Box>
 
-        <div className="divide-y divide-gray-200">
-          {filteredUsers.map((user) => {
-            const tierInfo = TIER_INFO[user.tier]
-            return (
-              <div key={user.uid} className={`p-4 hover:bg-slate-50 transition-colors ${user.isTestAccount ? 'opacity-60' : ''}`}>
-                <div className="sm:grid sm:grid-cols-[1fr_auto_auto_auto_auto_auto] sm:gap-4 sm:items-center">
-                  <div className="flex items-center gap-3 mb-3 sm:mb-0">
-                    <img
+        {/* User Rows */}
+        {filteredUsers.map((user, index) => {
+          const tierInfo = TIER_INFO[user.tier]
+          return (
+            <Box key={user.uid}>
+              {index > 0 && <Divider />}
+              <Box
+                sx={{
+                  p: 2,
+                  opacity: user.isTestAccount ? 0.6 : 1,
+                  '&:hover': { bgcolor: 'grey.50' },
+                  transition: 'background-color 0.2s',
+                }}
+              >
+                <Box
+                  sx={{
+                    display: { sm: 'grid' },
+                    gridTemplateColumns: { sm: '1fr auto auto auto auto auto' },
+                    gap: { sm: 2 },
+                    alignItems: { sm: 'center' },
+                  }}
+                >
+                  {/* User Info */}
+                  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: { xs: 1.5, sm: 0 } }}>
+                    <Avatar
                       src={user.photoURL || '/default-avatar.svg'}
                       alt={user.displayName}
-                      className="avatar avatar-md"
-                      style={{ borderColor: tierInfo.color }}
+                      sx={{ width: 40, height: 40, border: 2, borderColor: tierInfo.color }}
                     />
-                    <div className="min-w-0">
-                      <p className="text-slate-900 font-medium truncate">
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {user.nickname || user.displayName}
-                        {user.isChallenger && <span className="ml-1.5 text-xs">{TIER_INFO.challenger.emoji}</span>}
-                      </p>
-                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
-                    </div>
-                  </div>
+                        {user.isChallenger && <Box component="span" sx={{ ml: 0.75, fontSize: '0.75rem' }}>{TIER_INFO.challenger.emoji}</Box>}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {user.email}
+                      </Typography>
+                    </Box>
+                  </Stack>
 
-                  <div className="flex items-center justify-between sm:contents">
-                    <div className="sm:w-24 sm:flex sm:justify-center">
-                      <span
-                        className="text-xs font-medium px-2 py-0.5 rounded"
-                        style={{
-                          backgroundColor: `${tierInfo.color}20`,
-                          color: tierInfo.color,
-                        }}
+                  {/* Tier */}
+                  <Box sx={{ width: { sm: 96 }, display: { sm: 'flex' }, justifyContent: { sm: 'center' } }}>
+                    <Chip
+                      label={`${tierInfo.emoji} ${tierInfo.name}`}
+                      size="small"
+                      sx={{
+                        bgcolor: `${tierInfo.color}20`,
+                        color: tierInfo.color,
+                        fontWeight: 500,
+                        fontSize: '0.75rem',
+                      }}
+                    />
+                  </Box>
+
+                  {/* Points */}
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main', width: { sm: 80 }, textAlign: { sm: 'right' } }}>
+                    {user.points}P
+                  </Typography>
+
+                  {/* Admin Badge */}
+                  <Box sx={{ width: { sm: 64 }, textAlign: { sm: 'center' }, display: { xs: 'none', sm: 'block' } }}>
+                    {user.isAdmin ? (
+                      <CheckIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">-</Typography>
+                    )}
+                  </Box>
+
+                  {/* Test Badge */}
+                  <Box sx={{ width: { sm: 48 }, textAlign: { sm: 'center' }, display: { xs: 'none', sm: 'block' } }}>
+                    {user.isTestAccount ? (
+                      <CheckIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">-</Typography>
+                    )}
+                  </Box>
+
+                  {/* Actions */}
+                  <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ width: { sm: 224 } }}>
+                    <Button size="small" onClick={() => adjustPoints(user)}>
+                      포인트
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => toggleTestAccount(user)}
+                      color={user.isTestAccount ? 'warning' : 'inherit'}
+                      title="테스트 계정 토글"
+                    >
+                      {user.isTestAccount ? '테스트 해제' : '테스트'}
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => toggleAdmin(user)}
+                      color={user.isAdmin ? 'error' : 'primary'}
+                    >
+                      {user.isAdmin ? '관리자 해제' : '관리자'}
+                    </Button>
+                    {!user.isAdmin && (
+                      <Button
+                        size="small"
+                        color="error"
+                        onClick={() => deleteUser(user)}
+                        title="회원 삭제"
+                        startIcon={<DeleteOutlineIcon sx={{ fontSize: 14 }} />}
                       >
-                        {tierInfo.emoji} {tierInfo.name}
-                      </span>
-                    </div>
-
-                    <span className="text-primary-600 font-bold sm:w-20 sm:text-right">
-                      {user.points}P
-                    </span>
-
-                    <span className="sm:w-16 sm:text-center hidden sm:block">
-                      {user.isAdmin ? (
-                        <span className="inline-flex items-center gap-1 text-primary-500">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                      ) : (
-                        <span className="text-slate-500">-</span>
-                      )}
-                    </span>
-
-                    <span className="sm:w-12 sm:text-center hidden sm:block">
-                      {user.isTestAccount ? (
-                        <span className="inline-flex items-center gap-1 text-orange-400">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                      ) : (
-                        <span className="text-slate-500">-</span>
-                      )}
-                    </span>
-
-                    <div className="flex justify-end gap-2 sm:w-56">
-                      <button
-                        onClick={() => adjustPoints(user)}
-                        className="px-3 py-1.5 text-xs font-medium text-primary-600 hover:bg-primary-50 rounded transition-colors"
-                      >
-                        포인트
-                      </button>
-                      <button
-                        onClick={() => toggleTestAccount(user)}
-                        className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
-                          user.isTestAccount
-                            ? 'text-orange-400 hover:bg-orange-400/10'
-                            : 'text-slate-500 hover:bg-slate-100'
-                        }`}
-                        title="테스트 계정 토글"
-                      >
-                        {user.isTestAccount ? '테스트 해제' : '테스트'}
-                      </button>
-                      <button
-                        onClick={() => toggleAdmin(user)}
-                        className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
-                          user.isAdmin
-                            ? 'text-red-400 hover:bg-red-400/10'
-                            : 'text-primary-500 hover:bg-primary-50'
-                        }`}
-                      >
-                        {user.isAdmin ? '관리자 해제' : '관리자'}
-                      </button>
-                      {!user.isAdmin && (
-                        <button
-                          onClick={() => deleteUser(user)}
-                          className="px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-500/10 rounded transition-colors"
-                          title="회원 삭제"
-                        >
-                          삭제
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </div>
+                        삭제
+                      </Button>
+                    )}
+                  </Stack>
+                </Box>
+              </Box>
+            </Box>
+          )
+        })}
+      </Paper>
+    </Stack>
   )
 }
 
@@ -415,104 +468,124 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
   }
 
   return (
-    <div className="space-y-6">
+    <Stack spacing={3}>
       {/* Current Challengers */}
-      <div className="card overflow-hidden">
-        <div className="card-header bg-gradient-to-r from-amber-100 to-transparent">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{TIER_INFO.challenger.emoji}</span>
-            <div>
-              <h2 className="heading-3 text-primary-600">현재 챌린저</h2>
-              <p className="text-sm text-slate-500">{challengers.length}명의 챌린저</p>
-            </div>
-          </div>
-        </div>
+      <Paper sx={{ overflow: 'hidden' }}>
+        <Box sx={{ p: 2.5, background: 'linear-gradient(to right, #fef3c7, transparent)' }}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Typography sx={{ fontSize: '1.5rem' }}>{TIER_INFO.challenger.emoji}</Typography>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>현재 챌린저</Typography>
+              <Typography variant="body2" color="text.secondary">{challengers.length}명의 챌린저</Typography>
+            </Box>
+          </Stack>
+        </Box>
 
-        <div className="card-body">
+        <Box sx={{ p: 2.5 }}>
           {challengers.length === 0 ? (
-            <div className="text-center py-12">
-              <span className="text-5xl mb-4 block">👑</span>
-              <p className="text-slate-500">아직 챌린저가 없습니다</p>
-              <p className="text-sm text-slate-500">아래에서 지정해주세요</p>
-            </div>
+            <Box sx={{ textAlign: 'center', py: 6 }}>
+              <Typography sx={{ fontSize: '3rem', mb: 2 }}>👑</Typography>
+              <Typography color="text.secondary">아직 챌린저가 없습니다</Typography>
+              <Typography variant="body2" color="text.secondary">아래에서 지정해주세요</Typography>
+            </Box>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <Box sx={{ display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', lg: '1fr 1fr 1fr' }, gap: 1.5 }}>
               {challengers.map((user) => (
-                <div
+                <Paper
                   key={user.uid}
-                  className="flex items-center gap-3 p-3 bg-gradient-to-r from-amber-50 to-transparent border border-amber-200 rounded"
+                  variant="outlined"
+                  sx={{
+                    p: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    background: 'linear-gradient(to right, #fffbeb, transparent)',
+                    borderColor: 'warning.light',
+                  }}
                 >
-                  <img
+                  <Avatar
                     src={user.photoURL || '/default-avatar.svg'}
                     alt={user.displayName}
-                    className="avatar avatar-lg"
-                    style={{ borderColor: TIER_INFO.challenger.color }}
+                    sx={{ width: 48, height: 48, border: 2, borderColor: TIER_INFO.challenger.color }}
                   />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-900 truncate">{user.nickname || user.displayName}</p>
-                    <p className="text-sm text-primary-600">{user.points}P</p>
-                  </div>
-                  <button
-                    onClick={() => toggleChallenger(user)}
-                    className="px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-400/10 rounded transition-colors"
-                  >
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {user.nickname || user.displayName}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'primary.main' }}>{user.points}P</Typography>
+                  </Box>
+                  <Button size="small" color="error" onClick={() => toggleChallenger(user)}>
                     해제
-                  </button>
-                </div>
+                  </Button>
+                </Paper>
               ))}
-            </div>
+            </Box>
           )}
-        </div>
-      </div>
+        </Box>
+      </Paper>
 
       {/* Assign Challenger */}
-      <div className="card overflow-hidden">
-        <div className="card-header">
-          <h2 className="heading-3 text-primary-600">챌린저 지정하기</h2>
-          <p className="text-sm text-slate-500">
+      <Paper sx={{ overflow: 'hidden' }}>
+        <Box sx={{ p: 2.5 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>챌린저 지정하기</Typography>
+          <Typography variant="body2" color="text.secondary">
             포인트 상위 유저들 중에서 챌린저를 선정하세요
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        <div className="divide-y divide-gray-200">
-          {nonChallengers.slice(0, 20).map((user, index) => {
-            const tierInfo = TIER_INFO[user.tier]
-            return (
-              <div
-                key={user.uid}
-                className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors"
+        {nonChallengers.slice(0, 20).map((user, index) => {
+          const tierInfo = TIER_INFO[user.tier]
+          return (
+            <Box key={user.uid}>
+              {index > 0 && <Divider />}
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                sx={{ p: 2, '&:hover': { bgcolor: 'grey.50' }, transition: 'background-color 0.2s' }}
               >
-                <span className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 text-sm font-medium">
+                <Avatar
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: 'grey.100',
+                    color: 'text.secondary',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                  }}
+                >
                   {index + 1}
-                </span>
-                <img
+                </Avatar>
+                <Avatar
                   src={user.photoURL || '/default-avatar.svg'}
                   alt={user.displayName}
-                  className="avatar avatar-md"
-                  style={{ borderColor: tierInfo.color }}
+                  sx={{ width: 40, height: 40, border: 2, borderColor: tierInfo.color }}
                 />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-900 truncate">{user.nickname || user.displayName}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs" style={{ color: tierInfo.color }}>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {user.nickname || user.displayName}
+                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.25 }}>
+                    <Typography variant="caption" sx={{ color: tierInfo.color }}>
                       {tierInfo.emoji} {tierInfo.name}
-                    </span>
-                    <span className="text-sm text-primary-600 font-medium">{user.points}P</span>
-                  </div>
-                </div>
-                <button
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 500 }}>{user.points}P</Typography>
+                  </Stack>
+                </Box>
+                <Button
+                  size="small"
+                  variant="outlined"
                   onClick={() => toggleChallenger(user)}
-                  className="px-4 py-2 text-sm font-medium text-primary-500 border border-primary-300 hover:bg-primary-50 rounded transition-colors flex items-center gap-2"
+                  startIcon={<Box component="span">👑</Box>}
                 >
-                  <span>👑</span>
-                  <span className="hidden sm:inline">챌린저 지정</span>
-                </button>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </div>
+                  <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>챌린저 지정</Box>
+                </Button>
+              </Stack>
+            </Box>
+          )
+        })}
+      </Paper>
+    </Stack>
   )
 }
 
@@ -567,110 +640,107 @@ function RewardsTab({
   }
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6">
+    <Box sx={{ display: 'grid', gridTemplateColumns: { lg: '1fr 1fr' }, gap: 3 }}>
       {/* Give Reward Form */}
-      <div className="card overflow-hidden">
-        <div className="card-header">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🎁</span>
-            <h2 className="heading-3 text-primary-600">상품 지급</h2>
-          </div>
-        </div>
+      <Paper sx={{ overflow: 'hidden' }}>
+        <Box sx={{ p: 2.5 }}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography sx={{ fontSize: '1.25rem' }}>🎁</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>상품 지급</Typography>
+          </Stack>
+        </Box>
 
-        <form onSubmit={handleGiveReward} className="card-body space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-900 mb-2">
-              대상 유저
-            </label>
-            <select
+        <Box component="form" onSubmit={handleGiveReward} sx={{ p: 2.5, pt: 0 }}>
+          <Stack spacing={2.5}>
+            <TextField
+              select
               value={selectedUser}
               onChange={(e) => setSelectedUser(e.target.value)}
-              className="input select"
+              label="대상 유저"
+              fullWidth
             >
-              <option value="">유저 선택...</option>
+              <MenuItem value="">유저 선택...</MenuItem>
               {users.map((user) => (
-                <option key={user.uid} value={user.uid}>
+                <MenuItem key={user.uid} value={user.uid}>
                   {user.nickname || user.displayName} ({user.points}P - {TIER_INFO[user.tier].name})
-                </option>
+                </MenuItem>
               ))}
-            </select>
-          </div>
+            </TextField>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-900 mb-2">
-              상품명
-            </label>
-            <input
-              type="text"
+            <TextField
+              fullWidth
               value={rewardName}
               onChange={(e) => setRewardName(e.target.value)}
+              label="상품명"
               placeholder="예: 스타벅스 아메리카노"
-              className="input"
             />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-900 mb-2">
-              설명 (선택)
-            </label>
-            <textarea
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              label="설명 (선택)"
               placeholder="상품 지급 사유나 설명"
-              className="input textarea"
             />
-          </div>
 
-          <button
-            type="submit"
-            disabled={submitting || !selectedUser || !rewardName.trim()}
-            className="w-full btn btn-primary btn-lg"
-          >
-            {submitting ? '지급 중...' : '상품 지급'}
-          </button>
-        </form>
-      </div>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              fullWidth
+              disabled={submitting || !selectedUser || !rewardName.trim()}
+            >
+              {submitting ? '지급 중...' : '상품 지급'}
+            </Button>
+          </Stack>
+        </Box>
+      </Paper>
 
       {/* Reward History */}
-      <div className="card overflow-hidden">
-        <div className="card-header flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">📋</span>
-            <h2 className="heading-3 text-primary-600">지급 내역</h2>
-          </div>
-          <span className="text-sm text-slate-500">{rewards.length}건</span>
-        </div>
+      <Paper sx={{ overflow: 'hidden' }}>
+        <Box sx={{ p: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography sx={{ fontSize: '1.25rem' }}>📋</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>지급 내역</Typography>
+          </Stack>
+          <Typography variant="body2" color="text.secondary">{rewards.length}건</Typography>
+        </Box>
 
-        <div className="max-h-[500px] overflow-y-auto">
+        <Box sx={{ maxHeight: 500, overflowY: 'auto' }}>
           {rewards.length === 0 ? (
-            <div className="py-12 text-center">
-              <span className="text-5xl mb-4 block">📭</span>
-              <p className="text-slate-500">아직 지급 내역이 없습니다</p>
-            </div>
+            <Box sx={{ py: 6, textAlign: 'center' }}>
+              <Typography sx={{ fontSize: '3rem', mb: 2 }}>📭</Typography>
+              <Typography color="text.secondary">아직 지급 내역이 없습니다</Typography>
+            </Box>
           ) : (
-            <div className="divide-y divide-slate-200">
-              {rewards.map((reward) => (
-                <div key={reward.id} className="p-4 hover:bg-slate-50 transition-colors">
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">🎁</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-900">{reward.rewardName}</p>
-                      <p className="text-sm text-primary-600">{reward.userName}</p>
-                      {reward.description && (
-                        <p className="text-sm text-slate-500 mt-1">{reward.description}</p>
-                      )}
-                    </div>
-                    <div className="text-right text-xs text-slate-500 shrink-0">
-                      <p>{reward.givenAt.toLocaleDateString('ko-KR')}</p>
-                      <p className="mt-0.5">by {reward.givenBy}</p>
-                    </div>
-                  </div>
-                </div>
+            <>
+              {rewards.map((reward, index) => (
+                <Box key={reward.id}>
+                  {index > 0 && <Divider />}
+                  <Box sx={{ p: 2, '&:hover': { bgcolor: 'grey.50' }, transition: 'background-color 0.2s' }}>
+                    <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                      <Typography sx={{ fontSize: '1.5rem' }}>🎁</Typography>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{reward.rewardName}</Typography>
+                        <Typography variant="body2" sx={{ color: 'primary.main' }}>{reward.userName}</Typography>
+                        {reward.description && (
+                          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{reward.description}</Typography>
+                        )}
+                      </Box>
+                      <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+                        <Typography variant="caption" color="text.secondary">{reward.givenAt.toLocaleDateString('ko-KR')}</Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>by {reward.givenBy}</Typography>
+                      </Box>
+                    </Stack>
+                  </Box>
+                </Box>
               ))}
-            </div>
+            </>
           )}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Paper>
+    </Box>
   )
 }

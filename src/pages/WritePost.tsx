@@ -1,5 +1,22 @@
 import { useState } from 'react'
-import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom'
+import {
+  Box,
+  Container,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  Stack,
+  Chip,
+  Alert,
+  Breadcrumbs,
+  Link,
+  IconButton,
+} from '@mui/material'
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
+import CloseIcon from '@mui/icons-material/Close'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { useAuth } from '../contexts/AuthContext'
 import { createPost, uploadPostImage } from '../services/postService'
 import { POINT_VALUES, CategoryType, CATEGORY_INFO } from '../types'
@@ -99,161 +116,220 @@ export default function WritePost() {
 
   if (!currentUser) {
     return (
-      <div className="section">
-        <div className="container-xs">
-          <div className="card text-center py-16">
-            <div className="text-5xl mb-4">🔒</div>
-            <p className="text-slate-500 mb-6">로그인이 필요합니다</p>
-            <Link to="/" className="btn btn-primary">
-              홈으로 가기
-            </Link>
-          </div>
-        </div>
-      </div>
+      <Container maxWidth="sm" sx={{ py: 6 }}>
+        <Paper sx={{ textAlign: 'center', py: 8, px: 3 }}>
+          <Typography sx={{ fontSize: '3rem', mb: 2 }}>🔒</Typography>
+          <Typography sx={{ color: 'text.secondary', mb: 3 }}>로그인이 필요합니다</Typography>
+          <Button component={RouterLink} to="/" variant="contained">
+            홈으로 가기
+          </Button>
+        </Paper>
+      </Container>
     )
   }
 
   return (
-    <div className="section">
-      <div className="container-sm">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <Link to="/" className="hover:text-primary-600 transition-colors">홈</Link>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          <Link to={categoryLink} className="hover:text-primary-600 transition-colors flex items-center gap-1">
-            <span>{info.icon}</span>
-            <span>{info.name}</span>
-          </Link>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          <span>글쓰기</span>
-        </nav>
+    <Container maxWidth="md" sx={{ py: 6 }}>
+      {/* Breadcrumb */}
+      <Breadcrumbs
+        separator={<ChevronRightIcon sx={{ fontSize: 16 }} />}
+        sx={{ mb: 3, fontSize: '0.875rem' }}
+      >
+        <Link
+          component={RouterLink}
+          to="/"
+          underline="hover"
+          color="text.secondary"
+          sx={{ '&:hover': { color: 'primary.main' } }}
+        >
+          홈
+        </Link>
+        <Link
+          component={RouterLink}
+          to={categoryLink}
+          underline="hover"
+          color="text.secondary"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            '&:hover': { color: 'primary.main' },
+          }}
+        >
+          <span>{info.icon}</span>
+          <span>{info.name}</span>
+        </Link>
+        <Typography sx={{ fontSize: '0.875rem', color: 'text.primary' }}>글쓰기</Typography>
+      </Breadcrumbs>
 
-        <div className="card">
-          {/* Header */}
-          <div className="card-header flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{info.icon}</span>
-              <h1 className="heading-3 text-primary-600">{info.name}</h1>
-            </div>
-            <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-sm font-bold rounded-full shadow-lg shadow-primary-500/30">
-              ✨ +{categoryPoints}P
-            </span>
-          </div>
+      <Paper sx={{ overflow: 'hidden' }}>
+        {/* Header */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 3,
+            py: 2,
+            borderBottom: 1,
+            borderColor: 'divider',
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Typography sx={{ fontSize: '1.5rem' }}>{info.icon}</Typography>
+            <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 700 }}>
+              {info.name}
+            </Typography>
+          </Stack>
+          <Chip
+            label={`✨ +${categoryPoints}P`}
+            size="small"
+            sx={{
+              background: 'linear-gradient(to right, #6366f1, #8b5cf6)',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              px: 1,
+              boxShadow: '0 4px 14px rgba(99,102,241,0.3)',
+            }}
+          />
+        </Box>
 
-          <div className="card-body">
-            {(error || imageError) && (
-              <div className="mb-5 p-4 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-400 flex items-center gap-2" role="alert">
-                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{error || imageError}</span>
-              </div>
-            )}
+        {/* Body */}
+        <Box sx={{ px: 3, py: 3 }}>
+          {(error || imageError) && (
+            <Alert severity="error" sx={{ mb: 2.5 }}>
+              {error || imageError}
+            </Alert>
+          )}
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-5">
-                <label htmlFor="title" className="block text-sm font-medium text-slate-900 mb-2">
-                  제목
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={placeholders.titlePlaceholder}
-                  className="input"
-                  maxLength={100}
-                />
-              </div>
+          <Box component="form" onSubmit={handleSubmit}>
+            {/* Title */}
+            <Box sx={{ mb: 2.5 }}>
+              <TextField
+                id="title"
+                label="제목"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={placeholders.titlePlaceholder}
+                inputProps={{ maxLength: 100 }}
+                fullWidth
+              />
+            </Box>
 
-              <div className="mb-6">
-                <label htmlFor="content" className="block text-sm font-medium text-slate-900 mb-2">
-                  내용
-                </label>
-                <textarea
-                  id="content"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  onPaste={handlePaste}
-                  placeholder={placeholders.contentPlaceholder}
-                  className="input textarea h-64"
-                  maxLength={5000}
-                />
-                <div className="flex justify-between mt-2">
-                  <span className="text-xs text-slate-400">Ctrl+V로 이미지 붙여넣기 가능</span>
-                  <span className="text-xs text-slate-500">{content.length} / 5000</span>
-                </div>
-              </div>
+            {/* Content */}
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                id="content"
+                label="내용"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                onPaste={handlePaste}
+                placeholder={placeholders.contentPlaceholder}
+                inputProps={{ maxLength: 5000 }}
+                multiline
+                rows={10}
+                fullWidth
+              />
+              <Stack direction="row" justifyContent="space-between" sx={{ mt: 1 }}>
+                <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                  Ctrl+V로 이미지 붙여넣기 가능
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  {content.length} / 5000
+                </Typography>
+              </Stack>
+            </Box>
 
-              {/* Image Upload */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-900 mb-2">
-                  이미지 첨부 <span className="text-slate-500 font-normal">(선택)</span>
-                </label>
+            {/* Image Upload */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
+                이미지 첨부{' '}
+                <Typography component="span" variant="body2" sx={{ color: 'text.secondary', fontWeight: 400 }}>
+                  (선택)
+                </Typography>
+              </Typography>
 
-                {imagePreview ? (
-                  <div className="relative">
-                    <img
-                      src={imagePreview}
-                      alt="미리보기"
-                      className="w-full max-h-80 object-contain rounded border border-slate-200 bg-slate-50"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 w-8 h-8 bg-red-500/80 hover:bg-red-500 rounded-full flex items-center justify-center transition-colors"
-                    >
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ) : (
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-primary-200 rounded-xl p-8 text-center cursor-pointer hover:border-primary-400 hover:bg-primary-50/50 transition-all duration-300"
+              {imagePreview ? (
+                <Box sx={{ position: 'relative' }}>
+                  <Box
+                    component="img"
+                    src={imagePreview}
+                    alt="미리보기"
+                    sx={{
+                      width: '100%',
+                      maxHeight: 320,
+                      objectFit: 'contain',
+                      borderRadius: 1,
+                      border: 1,
+                      borderColor: 'divider',
+                      bgcolor: 'grey.50',
+                    }}
+                  />
+                  <IconButton
+                    onClick={handleRemoveImage}
+                    size="small"
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      bgcolor: 'rgba(239,68,68,0.8)',
+                      color: '#fff',
+                      '&:hover': { bgcolor: 'error.main' },
+                    }}
                   >
-                    <svg className="w-10 h-10 mx-auto mb-3 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-sm text-slate-500 mb-1">클릭하여 이미지 업로드</p>
-                    <p className="text-xs text-slate-400">PNG, JPG, GIF (최대 5MB)</p>
-                  </div>
-                )}
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </div>
-
-              <div className="flex gap-4 mt-8">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  className="flex-1 btn btn-secondary"
+                    <CloseIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Box>
+              ) : (
+                <Paper
+                  variant="outlined"
+                  onClick={() => fileInputRef.current?.click()}
+                  sx={{
+                    border: '2px dashed',
+                    borderColor: 'primary.light',
+                    borderRadius: 3,
+                    py: 4,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      bgcolor: 'action.hover',
+                    },
+                  }}
                 >
-                  취소
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 btn btn-primary"
-                >
-                  {submitting ? '작성 중...' : '작성하기'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+                  <AddPhotoAlternateIcon sx={{ fontSize: 40, color: 'primary.light', mb: 1.5 }} />
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
+                    클릭하여 이미지 업로드
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                    PNG, JPG, GIF (최대 5MB)
+                  </Typography>
+                </Paper>
+              )}
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                hidden
+              />
+            </Box>
+
+            {/* Buttons */}
+            <Stack direction="row" spacing={2} sx={{ mt: 4 }}>
+              <Button variant="outlined" onClick={() => navigate(-1)} fullWidth>
+                취소
+              </Button>
+              <Button type="submit" variant="contained" disabled={submitting} fullWidth>
+                {submitting ? '작성 중...' : '작성하기'}
+              </Button>
+            </Stack>
+          </Box>
+        </Box>
+      </Paper>
+    </Container>
   )
 }

@@ -1,5 +1,10 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link } from 'react-router-dom'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Paper from '@mui/material/Paper'
 import { useAuth } from './contexts/AuthContext'
 import Layout from './components/layout/Layout'
 import ProtectedRoute from './components/common/ProtectedRoute'
@@ -26,15 +31,21 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-accent-50">
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <LoadingSpinner />
-      </div>
+      </Box>
     )
   }
 
   return (
     <ErrorBoundary>
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>}>
+      <Suspense
+        fallback={
+          <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <LoadingSpinner />
+          </Box>
+        }
+      >
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
@@ -92,15 +103,19 @@ export default function App() {
             <Route
               path="*"
               element={
-                <div className="section">
-                  <div className="container-xs">
-                    <div className="card text-center py-16">
-                      <div className="text-5xl mb-4">404</div>
-                      <p className="text-slate-500 mb-6">페이지를 찾을 수 없습니다</p>
-                      <a href="/" className="btn btn-primary">홈으로 가기</a>
-                    </div>
-                  </div>
-                </div>
+                <Container maxWidth="sm" sx={{ py: 10 }}>
+                  <Paper sx={{ textAlign: 'center', py: 8, px: 4 }}>
+                    <Typography variant="h1" sx={{ mb: 2, color: 'text.disabled' }}>
+                      404
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4 }}>
+                      페이지를 찾을 수 없습니다
+                    </Typography>
+                    <Button variant="contained" component={Link} to="/">
+                      홈으로 가기
+                    </Button>
+                  </Paper>
+                </Container>
               }
             />
           </Route>

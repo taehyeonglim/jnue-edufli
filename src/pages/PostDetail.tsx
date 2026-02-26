@@ -1,10 +1,30 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
+import Avatar from '@mui/material/Avatar'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import TextField from '@mui/material/TextField'
+import Stack from '@mui/material/Stack'
+import Divider from '@mui/material/Divider'
+import Breadcrumbs from '@mui/material/Breadcrumbs'
+import Link from '@mui/material/Link'
+import Alert from '@mui/material/Alert'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import MailOutlineIcon from '@mui/icons-material/MailOutline'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import EditIcon from '@mui/icons-material/Edit'
 import { useAuth } from '../contexts/AuthContext'
 import { getPost, toggleLike, addComment, deletePost, deleteComment } from '../services/postService'
 import { getUserById } from '../services/messageService'
 import { Post, Comment, User, POINT_VALUES, TIER_INFO } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import TierBadge from '../components/common/TierBadge'
 import SendMessageModal from '../components/common/SendMessageModal'
 import { getCategoryRoute } from '../utils/helpers'
 
@@ -122,17 +142,13 @@ export default function PostDetail() {
 
   if (!post) {
     return (
-      <div className="section">
-        <div className="container-xs">
-          <div className="card text-center py-16">
-            <div className="text-5xl mb-4">😢</div>
-            <p className="text-slate-500 mb-6">게시글을 찾을 수 없습니다</p>
-            <button onClick={() => navigate(-1)} className="btn btn-secondary">
-              돌아가기
-            </button>
-          </div>
-        </div>
-      </div>
+      <Container maxWidth='md' sx={{ py: 4, textAlign: 'center' }}>
+        <Paper elevation={0} sx={{ p: 8, borderRadius: 3, border: 1, borderColor: 'divider' }}>
+          <Typography variant='h4' sx={{ mb: 2 }}>😢</Typography>
+          <Typography color='text.secondary' sx={{ mb: 3 }}>게시글을 찾을 수 없습니다</Typography>
+          <Button variant='outlined' onClick={() => navigate(-1)}>돌아가기</Button>
+        </Paper>
+      </Container>
     )
   }
 
@@ -143,177 +159,198 @@ export default function PostDetail() {
   const tierInfo = TIER_INFO[post.authorTier] || TIER_INFO.bronze
 
   return (
-    <div className="section">
-      <div className="container-sm">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <Link to="/" className="hover:text-primary-600 transition-colors">홈</Link>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          <Link to={categoryInfo.link} className="hover:text-primary-600 transition-colors flex items-center gap-1">
-            <span>{categoryInfo.icon}</span>
-            <span>{categoryInfo.label}</span>
-          </Link>
-        </nav>
+    <Container maxWidth='md' sx={{ py: 4, pb: 8 }}>
+      {/* Breadcrumb */}
+      <Breadcrumbs
+        separator={<ChevronRightIcon sx={{ fontSize: 16 }} />}
+        sx={{ mb: 3 }}
+      >
+        <Link component={RouterLink} to='/' underline='hover' color='text.secondary' sx={{ fontSize: 14 }}>
+          홈
+        </Link>
+        <Link component={RouterLink} to={categoryInfo.link} underline='hover' color='text.secondary' sx={{ fontSize: 14 }}>
+          {categoryInfo.icon} {categoryInfo.label}
+        </Link>
+      </Breadcrumbs>
 
-        {/* Post Content */}
-        <article className="card mb-6">
-          <div className="card-body">
-            {/* Author Info */}
-            <div className="flex items-start justify-between gap-4 mb-6">
-              <div className="flex items-center gap-3">
-                <img
-                  src={post.authorPhotoURL || '/default-avatar.svg'}
-                  alt={post.authorName}
-                  className="avatar avatar-md"
-                  style={{ borderColor: tierInfo.color }}
-                />
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="font-semibold text-slate-900">{post.authorName}</span>
-                    <span
-                      className="text-xs font-semibold px-3 py-1 rounded-full"
-                      style={{
-                        backgroundColor: `${tierInfo.color}25`,
-                        color: tierInfo.color,
-                      }}
-                    >
-                      {tierInfo.emoji} {tierInfo.name}
-                    </span>
-                  </div>
-                  <span className="text-xs text-slate-500">
-                    {post.createdAt.toLocaleString('ko-KR')}
-                  </span>
-                </div>
-              </div>
+      {/* Post Content */}
+      <Paper elevation={0} sx={{ mb: 3, p: { xs: 2, sm: 4 }, borderRadius: 3, border: 1, borderColor: 'divider' }}>
+        {/* Author Info */}
+        <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={2} sx={{ mb: 3 }}>
+          <Stack direction='row' spacing={1.5} alignItems='center'>
+            <Avatar
+              src={post.authorPhotoURL || '/default-avatar.svg'}
+              alt={post.authorName}
+              sx={{
+                width: 48,
+                height: 48,
+                border: `2px solid ${tierInfo.color}`,
+              }}
+            />
+            <Box>
+              <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 0.25 }}>
+                <Typography variant='subtitle2' color='text.primary'>{post.authorName}</Typography>
+                <TierBadge tier={post.authorTier} size='sm' />
+              </Stack>
+              <Typography variant='caption' color='text.secondary'>
+                {post.createdAt.toLocaleString('ko-KR')}
+              </Typography>
+            </Box>
+          </Stack>
 
-              {(isAuthor || isAdmin) && (
-                <div className="flex items-center gap-2">
-                  {isAuthor && (
-                    <Link
-                      to={`/edit/${post.id}`}
-                      className="text-xs text-slate-500 hover:text-primary-600 transition-colors px-2 py-1"
-                    >
-                      수정
-                    </Link>
-                  )}
-                  <button
-                    onClick={handleDeletePost}
-                    className="text-xs text-red-400/70 hover:text-red-400 transition-colors px-2 py-1"
-                  >
-                    삭제
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Title & Content */}
-            <h1 className="heading-2 text-primary-600 mb-4">{post.title}</h1>
-            <div className="text-slate-900/90 whitespace-pre-wrap leading-relaxed mb-4">{post.content}</div>
-
-            {/* Post Image */}
-            {post.imageURL && (
-              <div className="mt-4">
-                <img
-                  src={post.imageURL}
-                  alt={`${post.title} 첨부 이미지`}
-                  className="w-full max-h-[500px] object-contain rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:opacity-90 transition-opacity"
-                  loading="lazy"
-                  onClick={() => window.open(post.imageURL, '_blank')}
-                />
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex items-center gap-4 mt-8 pt-5 border-t border-slate-200">
-              <button
-                onClick={handleLike}
-                disabled={!currentUser || isAuthor}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 ${
-                  isLiked
-                    ? 'bg-gradient-to-r from-red-400 to-pink-400 text-white shadow-lg shadow-red-400/30 scale-105'
-                    : 'bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-400'
-                }`}
-              >
-                <span>❤️</span>
-                <span>{post.likes.length}</span>
-              </button>
-              <span className="text-sm text-slate-500">
-                💬 댓글 {post.comments.length}개
-              </span>
-              {currentUser && !isAuthor && (
-                <button
-                  onClick={() => handleSendMessage(post.authorId)}
-                  className="flex items-center gap-2 px-4 py-2 rounded text-sm font-medium bg-slate-50 text-slate-500 border border-slate-200 hover:border-primary-400 hover:text-slate-900 transition-all ml-auto"
+          {(isAuthor || isAdmin) && (
+            <Stack direction='row' spacing={1}>
+              {isAuthor && (
+                <Button
+                  component={RouterLink}
+                  to={`/edit/${post.id}`}
+                  size='small'
+                  startIcon={<EditIcon />}
+                  color='inherit'
+                  sx={{ color: 'text.secondary', fontSize: 13 }}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span>쪽지</span>
-                </button>
+                  수정
+                </Button>
               )}
-            </div>
-          </div>
-        </article>
+              <Button
+                size='small'
+                startIcon={<DeleteOutlineIcon />}
+                color='error'
+                onClick={handleDeletePost}
+                sx={{ fontSize: 13 }}
+              >
+                삭제
+              </Button>
+            </Stack>
+          )}
+        </Stack>
 
-        {/* Comments Section */}
-        <section className="card">
-          <div className="card-header">
-            <h2 className="heading-3 text-primary-600 flex items-center gap-2">
-              <span>💬</span>
-              <span>댓글</span>
-              <span className="text-sm font-normal text-slate-500">({post.comments.length})</span>
-            </h2>
-          </div>
-          <div className="card-body">
-            {/* Comment Form */}
-            {currentUser ? (
-              <form onSubmit={handleComment} className="mb-6">
-                <textarea
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder={`댓글을 작성하세요 (+${POINT_VALUES.COMMENT}P)`}
-                  className="input textarea"
-                  maxLength={500}
+        {/* Title & Content */}
+        <Typography variant='h5' color='primary' sx={{ fontWeight: 700, mb: 2 }}>
+          {post.title}
+        </Typography>
+        <Typography
+          variant='body1'
+          sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.8, color: 'text.primary', mb: 2 }}
+        >
+          {post.content}
+        </Typography>
+
+        {/* Post Image */}
+        {post.imageURL && (
+          <Box sx={{ mt: 2 }}>
+            <Box
+              component='img'
+              src={post.imageURL}
+              alt={`${post.title} 첨부 이미지`}
+              loading='lazy'
+              onClick={() => window.open(post.imageURL, '_blank')}
+              sx={{
+                width: '100%',
+                maxHeight: 500,
+                objectFit: 'contain',
+                borderRadius: 2,
+                border: 1,
+                borderColor: 'divider',
+                bgcolor: 'grey.50',
+                cursor: 'pointer',
+                '&:hover': { opacity: 0.9 },
+              }}
+            />
+          </Box>
+        )}
+
+        {/* Actions */}
+        <Divider sx={{ mt: 4, mb: 2 }} />
+        <Stack direction='row' spacing={2} alignItems='center'>
+          <Button
+            variant={isLiked ? 'contained' : 'outlined'}
+            color={isLiked ? 'error' : 'inherit'}
+            startIcon={isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            onClick={handleLike}
+            disabled={!currentUser || isAuthor}
+            size='small'
+            sx={{ borderRadius: 5, textTransform: 'none' }}
+          >
+            {post.likes.length}
+          </Button>
+          <Typography variant='body2' color='text.secondary'>
+            댓글 {post.comments.length}개
+          </Typography>
+          {currentUser && !isAuthor && (
+            <Button
+              variant='outlined'
+              color='inherit'
+              size='small'
+              startIcon={<MailOutlineIcon />}
+              onClick={() => handleSendMessage(post.authorId)}
+              sx={{ ml: 'auto !important', borderRadius: 2, textTransform: 'none', borderColor: 'divider' }}
+            >
+              쪽지
+            </Button>
+          )}
+        </Stack>
+      </Paper>
+
+      {/* Comments Section */}
+      <Paper elevation={0} sx={{ borderRadius: 3, border: 1, borderColor: 'divider', overflow: 'hidden' }}>
+        <Box sx={{ px: { xs: 2, sm: 4 }, py: 2, borderBottom: 1, borderColor: 'divider' }}>
+          <Typography variant='h6' color='primary' sx={{ fontWeight: 700 }}>
+            댓글 <Typography component='span' variant='body2' color='text.secondary'>({post.comments.length})</Typography>
+          </Typography>
+        </Box>
+        <Box sx={{ px: { xs: 2, sm: 4 }, py: 3 }}>
+          {/* Comment Form */}
+          {currentUser ? (
+            <Box component='form' onSubmit={handleComment} sx={{ mb: 3 }}>
+              <TextField
+                fullWidth
+                multiline
+                minRows={2}
+                maxRows={6}
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder={`댓글을 작성하세요 (+${POINT_VALUES.COMMENT}P)`}
+                inputProps={{ maxLength: 500 }}
+                size='small'
+              />
+              <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mt: 1.5 }}>
+                <Typography variant='caption' color='text.secondary'>{commentText.length}/500</Typography>
+                <Button
+                  type='submit'
+                  variant='contained'
+                  size='small'
+                  disabled={!commentText.trim() || submitting}
+                >
+                  {submitting ? '작성 중...' : '댓글 작성'}
+                </Button>
+              </Stack>
+            </Box>
+          ) : (
+            <Alert severity='info' sx={{ mb: 3 }}>
+              댓글을 작성하려면 로그인하세요
+            </Alert>
+          )}
+
+          {/* Comments List */}
+          {post.comments.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant='body2' color='text.secondary'>아직 댓글이 없습니다</Typography>
+            </Box>
+          ) : (
+            <Stack spacing={2}>
+              {post.comments.map((comment) => (
+                <CommentItem
+                  key={comment.id}
+                  comment={comment}
+                  canDelete={currentUser?.uid === comment.authorId || isAdmin}
+                  onDelete={() => handleDeleteComment(comment)}
                 />
-                <div className="flex items-center justify-between mt-3">
-                  <span className="text-xs text-slate-500">{commentText.length}/500</span>
-                  <button
-                    type="submit"
-                    disabled={!commentText.trim() || submitting}
-                    className="btn btn-primary btn-sm"
-                  >
-                    {submitting ? '작성 중...' : '댓글 작성'}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="mb-6 p-4 bg-slate-50 rounded border border-slate-200 text-center">
-                <p className="text-sm text-slate-500">댓글을 작성하려면 로그인하세요</p>
-              </div>
-            )}
-
-            {/* Comments List */}
-            {post.comments.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-sm text-slate-500">아직 댓글이 없습니다</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {post.comments.map((comment) => (
-                  <CommentItem
-                    key={comment.id}
-                    comment={comment}
-                    canDelete={currentUser?.uid === comment.authorId || isAdmin}
-                    onDelete={() => handleDeleteComment(comment)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      </div>
+              ))}
+            </Stack>
+          )}
+        </Box>
+      </Paper>
 
       {/* Send Message Modal */}
       {messageTarget && (
@@ -323,7 +360,7 @@ export default function PostDetail() {
           onSuccess={() => alert('쪽지를 보냈습니다!')}
         />
       )}
-    </div>
+    </Container>
   )
 }
 
@@ -343,33 +380,43 @@ function CommentItem({
   const tierInfo = TIER_INFO[comment.authorTier] || TIER_INFO.bronze
 
   return (
-    <div className="flex gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
-      <img
-        src={comment.authorPhotoURL || '/default-avatar.svg'}
-        alt={comment.authorName}
-        className="avatar avatar-sm shrink-0"
-        style={{ borderColor: tierInfo.color }}
-      />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-          <span className="text-sm font-medium text-slate-900">{comment.authorName}</span>
-          <span className="text-xs" style={{ color: tierInfo.color }}>
-            {tierInfo.emoji}
-          </span>
-          <span className="text-xs text-slate-500">
-            {createdAt.toLocaleString('ko-KR')}
-          </span>
-          {canDelete && (
-            <button
-              onClick={onDelete}
-              className="ml-auto text-xs text-red-400/60 hover:text-red-400 transition-colors"
-            >
-              삭제
-            </button>
-          )}
-        </div>
-        <p className="text-sm text-slate-900/80 leading-relaxed">{comment.content}</p>
-      </div>
-    </div>
+    <Paper variant='outlined' sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+      <Stack direction='row' spacing={1.5}>
+        <Avatar
+          src={comment.authorPhotoURL || '/default-avatar.svg'}
+          alt={comment.authorName}
+          sx={{
+            width: 36,
+            height: 36,
+            border: `2px solid ${tierInfo.color}`,
+            flexShrink: 0,
+          }}
+        />
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' sx={{ mb: 0.5 }}>
+            <Typography variant='body2' fontWeight={500}>{comment.authorName}</Typography>
+            <Typography variant='caption' sx={{ color: tierInfo.color }}>
+              {tierInfo.emoji}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {createdAt.toLocaleString('ko-KR')}
+            </Typography>
+            {canDelete && (
+              <IconButton
+                size='small'
+                color='error'
+                onClick={onDelete}
+                sx={{ ml: 'auto !important', p: 0.5 }}
+              >
+                <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            )}
+          </Stack>
+          <Typography variant='body2' sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+            {comment.content}
+          </Typography>
+        </Box>
+      </Stack>
+    </Paper>
   )
 }

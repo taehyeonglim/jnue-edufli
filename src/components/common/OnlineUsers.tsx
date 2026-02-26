@@ -3,6 +3,21 @@ import { collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp } from 
 import { db } from '../../config/firebase'
 import { useAuth, calculateTier } from '../../contexts/AuthContext'
 import { TierType, TIER_INFO } from '../../types'
+import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
+import Avatar from '@mui/material/Avatar'
+import AvatarGroup from '@mui/material/AvatarGroup'
+import Chip from '@mui/material/Chip'
+import Collapse from '@mui/material/Collapse'
+import ButtonBase from '@mui/material/ButtonBase'
+import Badge from '@mui/material/Badge'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import ListItemText from '@mui/material/ListItemText'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 interface OnlineUser {
   uid: string
@@ -47,13 +62,13 @@ export default function OnlineUsers() {
       const now = Date.now()
       const users: OnlineUser[] = []
 
-      snapshot.docs.forEach((doc) => {
-        const data = doc.data()
+      snapshot.docs.forEach((docSnap) => {
+        const data = docSnap.data()
         const lastSeen = data.lastSeen?.toDate?.() || new Date()
 
         if (now - lastSeen.getTime() < 120000) {
           users.push({
-            uid: doc.id,
+            uid: docSnap.id,
             displayName: data.displayName,
             nickname: data.nickname,
             photoURL: data.photoURL,
@@ -77,111 +92,105 @@ export default function OnlineUsers() {
   if (!currentUser) return null
 
   return (
-    <div className="fixed bottom-8 right-5 z-40">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-72 overflow-hidden">
+    <Box sx={{ position: 'fixed', bottom: 32, right: 20, zIndex: 40 }}>
+      <Paper elevation={8} sx={{ width: 280, borderRadius: 4, overflow: 'hidden' }}>
         {/* Header */}
-        <button
+        <ButtonBase
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+          sx={{ width: '100%', px: 3, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
-          <div className="flex items-center gap-2.5 ml-2">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-            </span>
-            <span className="text-sm font-medium text-slate-700">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Badge
+              variant="dot"
+              color="success"
+              overlap="circular"
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+              <Box sx={{ width: 10, height: 10 }} />
+            </Badge>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
               접속 중
-            </span>
-            <span className="px-2.5 py-1 bg-primary-50 text-primary-600 rounded-full text-xs font-semibold">
-              {onlineUsers.length}
-            </span>
-          </div>
-          <svg
-            className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
+            </Typography>
+            <Chip label={onlineUsers.length} size="small" color="primary" variant="outlined" />
+          </Box>
+          {isExpanded ? <ExpandLessIcon sx={{ color: 'text.disabled' }} /> : <ExpandMoreIcon sx={{ color: 'text.disabled' }} />}
+        </ButtonBase>
 
         {/* User List */}
-        {isExpanded && (
-          <div className="border-t border-slate-100">
+        <Collapse in={isExpanded}>
+          <Box sx={{ borderTop: 1, borderColor: 'divider' }}>
             {onlineUsers.length === 0 ? (
-              <div className="px-5 py-6 text-center">
-                <p className="text-sm text-slate-400">접속 중인 유저가 없습니다</p>
-              </div>
+              <Box sx={{ px: 3, py: 4, textAlign: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.disabled' }}>
+                  접속 중인 유저가 없습니다
+                </Typography>
+              </Box>
             ) : (
-              <div className="py-2">
+              <List dense disablePadding>
                 {onlineUsers.map((user) => {
                   const tierInfo = TIER_INFO[user.tier] || TIER_INFO.bronze
                   return (
-                    <div
+                    <ListItem
                       key={user.uid}
-                      className={`px-4 py-2.5 flex items-center gap-3 transition-colors ${
-                        user.uid === currentUser.uid
-                          ? 'bg-primary-50'
-                          : 'hover:bg-slate-50'
-                      }`}
+                      sx={{
+                        bgcolor: user.uid === currentUser.uid ? 'primary.50' : 'transparent',
+                        '&:hover': { bgcolor: user.uid === currentUser.uid ? 'primary.50' : 'action.hover' },
+                      }}
                     >
-                      <div className="relative shrink-0">
-                        <img
-                          src={user.photoURL || '/default-avatar.svg'}
-                          alt={user.nickname || user.displayName}
-                          className="w-8 h-8 rounded-full ring-1 ring-slate-200 object-cover"
-                        />
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full ring-2 ring-white"></span>
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-900 truncate">
-                          {user.nickname || user.displayName}
-                          {user.uid === currentUser.uid && (
-                            <span className="text-xs text-primary-500 ml-1">(나)</span>
-                          )}
-                        </p>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs">{tierInfo.emoji}</span>
-                          <span
-                            className="text-xs font-medium"
-                            style={{ color: tierInfo.color }}
-                          >
-                            {tierInfo.name}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                      <ListItemAvatar sx={{ minWidth: 40 }}>
+                        <Badge
+                          variant="dot"
+                          color="success"
+                          overlap="circular"
+                          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        >
+                          <Avatar
+                            src={user.photoURL || undefined}
+                            alt={user.nickname || user.displayName}
+                            sx={{ width: 32, height: 32 }}
+                          />
+                        </Badge>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {user.nickname || user.displayName}
+                            {user.uid === currentUser.uid && (
+                              <Typography component="span" variant="caption" sx={{ color: 'primary.main', ml: 0.5 }}>
+                                (나)
+                              </Typography>
+                            )}
+                          </Typography>
+                        }
+                        secondary={
+                          <Typography variant="caption" sx={{ color: tierInfo.color }}>
+                            {tierInfo.emoji} {tierInfo.name}
+                          </Typography>
+                        }
+                      />
+                    </ListItem>
                   )
                 })}
-              </div>
+              </List>
             )}
-          </div>
-        )}
+          </Box>
+        </Collapse>
 
         {/* Collapsed avatars */}
         {!isExpanded && onlineUsers.length > 0 && (
-          <div className="pb-4 pl-8 flex items-center">
-            <div className="flex -space-x-2">
-              {onlineUsers.slice(0, 4).map((user) => (
-                <img
+          <Box sx={{ pb: 2, pl: 3 }}>
+            <AvatarGroup max={4} sx={{ justifyContent: 'flex-end', '& .MuiAvatar-root': { width: 28, height: 28, fontSize: '0.75rem' } }}>
+              {onlineUsers.map((user) => (
+                <Avatar
                   key={user.uid}
-                  src={user.photoURL || '/default-avatar.svg'}
+                  src={user.photoURL || undefined}
                   alt={user.nickname || user.displayName}
-                  className="w-7 h-7 rounded-full ring-2 ring-white object-cover"
-                  title={user.nickname || user.displayName}
                 />
               ))}
-            </div>
-            {onlineUsers.length > 4 && (
-              <span className="text-xs text-slate-400 ml-2.5">
-                +{onlineUsers.length - 4}
-              </span>
-            )}
-          </div>
+            </AvatarGroup>
+          </Box>
         )}
-      </div>
-    </div>
+      </Paper>
+    </Box>
   )
 }

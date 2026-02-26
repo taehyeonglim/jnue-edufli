@@ -1,42 +1,58 @@
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+import Stack from '@mui/material/Stack'
+
 export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="mt-auto border-t border-slate-100 bg-white/60 backdrop-blur-xl">
-      <div className="container py-10">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+    <Box
+      component="footer"
+      sx={{
+        mt: 'auto',
+        borderTop: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+      }}
+    >
+      <Container maxWidth="lg" sx={{ py: 5 }}>
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          alignItems="center"
+          justifyContent="space-between"
+          spacing={3}
+        >
           {/* Brand */}
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-400 to-accent-400 rounded-xl blur-lg opacity-40" />
-              <img
-                src="/edufli-logo.png"
-                alt="Edu FLI"
-                className="relative w-9 h-9 rounded-xl object-contain shadow-lg"
-              />
-            </div>
-            <div>
-              <span className="font-bold text-base tracking-wide">
-                <span className="bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">Edu</span>
-                <span className="bg-gradient-to-r from-accent-500 to-accent-600 bg-clip-text text-transparent"> FLI</span>
-              </span>
-              <p className="text-[10px] text-slate-400 tracking-wider font-medium">Education & Future Learning Innovation</p>
-            </div>
-          </div>
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Box
+              component="img"
+              src="/edufli-logo.png"
+              alt="Edu FLI"
+              sx={{ width: 36, height: 36, borderRadius: 2, objectFit: 'contain' }}
+            />
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+                <Box component="span" sx={{ color: 'primary.main' }}>Edu</Box>
+                <Box component="span" sx={{ color: 'secondary.main' }}> FLI</Box>
+              </Typography>
+              <Typography variant="caption" sx={{ fontSize: '10px', color: 'text.disabled', letterSpacing: '0.05em', fontWeight: 500 }}>
+                Education & Future Learning Innovation
+              </Typography>
+            </Box>
+          </Stack>
 
           {/* Info */}
-          <div className="text-center">
-            <p className="text-xs text-slate-500 font-medium">
-              전주교육대학교 초등교육과 교육공학 동아리
-            </p>
-          </div>
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+            전주교육대학교 초등교육과 교육공학 동아리
+          </Typography>
 
           {/* Copyright */}
-          <p className="text-xs text-slate-400">
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
             &copy; {currentYear} Edu FLI. All rights reserved.
-          </p>
-        </div>
-      </div>
-    </footer>
+          </Typography>
+        </Stack>
+      </Container>
+    </Box>
   )
 }
