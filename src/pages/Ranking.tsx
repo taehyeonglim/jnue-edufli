@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
+import { useState, useEffect, memo } from 'react'
+import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { User, TIER_INFO, TIER_THRESHOLDS, TierType } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import ErrorMessage from '../components/common/ErrorMessage'
 import SendMessageModal from '../components/common/SendMessageModal'
 import { useAuth } from '../contexts/AuthContext'
 import { getNextTier } from '../utils/helpers'
@@ -11,6 +12,7 @@ export default function Ranking() {
   const { currentUser } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [messageTarget, setMessageTarget] = useState<User | null>(null)
 
   useEffect(() => {
@@ -18,11 +20,13 @@ export default function Ranking() {
   }, [])
 
   const loadRanking = async () => {
+    setError(null)
     try {
       const q = query(
         collection(db, 'users'),
+        where('isTestAccount', '!=', true),
         orderBy('points', 'desc'),
-        limit(100)
+        limit(50)
       )
       const snapshot = await getDocs(q)
       const usersData = snapshot.docs
@@ -34,11 +38,32 @@ export default function Ranking() {
             createdAt: data.createdAt?.toDate() || new Date(),
           } as User
         })
-        .filter((user) => !user.isTestAccount)
-        .slice(0, 50)
       setUsers(usersData)
-    } catch (error) {
-      console.error('랭킹 로딩 실패:', error)
+    } catch {
+      // isTestAccount 필드가 없는 문서가 있을 수 있으므로 fallback
+      try {
+        const q = query(
+          collection(db, 'users'),
+          orderBy('points', 'desc'),
+          limit(100)
+        )
+        const snapshot = await getDocs(q)
+        const usersData = snapshot.docs
+          .map((doc) => {
+            const data = doc.data()
+            return {
+              uid: doc.id,
+              ...data,
+              createdAt: data.createdAt?.toDate() || new Date(),
+            } as User
+          })
+          .filter((user) => !user.isTestAccount)
+          .slice(0, 50)
+        setUsers(usersData)
+      } catch (error) {
+        console.error('랭킹 로딩 실패:', error)
+        setError('랭킹을 불러오는 데 실패했습니다.')
+      }
     } finally {
       setLoading(false)
     }
@@ -173,8 +198,11 @@ export default function Ranking() {
             </div>
           </div>
 
+          {/* Error State */}
+          {error && <ErrorMessage message={error} onRetry={loadRanking} />}
+
           {/* Ranking List */}
-          <div className="card overflow-hidden">
+          {!error && <div className="card overflow-hidden">
             {/* Header */}
             <div
               className="grid grid-cols-[3rem_1fr_auto_6rem] gap-4 px-6 py-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200"
@@ -204,7 +232,7 @@ export default function Ranking() {
                 ))}
               </div>
             )}
-          </div>
+          </div>}
         </div>
       </div>
 
@@ -220,7 +248,7 @@ export default function Ranking() {
   )
 }
 
-function RankingRow({
+const RankingRow = memo(function RankingRow({
   user,
   rank,
   isCurrentUser,
@@ -299,6 +327,7 @@ function RankingRow({
             }}
             className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded transition-colors"
             title="쪽지 보내기"
+            aria-label={`${displayName}에게 쪽지 보내기`}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -308,4 +337,4 @@ function RankingRow({
       </div>
     </div>
   )
-}
+})

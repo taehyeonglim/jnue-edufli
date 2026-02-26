@@ -60,7 +60,15 @@ export async function uploadPostImage(file: File, userId: string): Promise<strin
 
 export async function deletePostImage(imageURL: string): Promise<void> {
   try {
-    const storageRef = ref(storage, imageURL)
+    // Firebase Storage 다운로드 URL에서 경로를 추출
+    const url = new URL(imageURL)
+    const pathMatch = decodeURIComponent(url.pathname).match(/\/o\/(.+)$/)
+    if (!pathMatch) {
+      console.error('유효하지 않은 Storage URL:', imageURL)
+      return
+    }
+    const storagePath = pathMatch[1]
+    const storageRef = ref(storage, storagePath)
     await deleteObject(storageRef)
   } catch (error) {
     console.error('이미지 삭제 실패:', error)

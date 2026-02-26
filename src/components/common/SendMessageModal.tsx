@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { sendMessage } from '../../services/messageService'
 import { User, TIER_INFO } from '../../types'
@@ -21,6 +21,14 @@ export default function SendMessageModal({
   const [error, setError] = useState('')
 
   const tierInfo = TIER_INFO[receiver.tier] || TIER_INFO.bronze
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

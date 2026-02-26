@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { GalleryImage } from '../types'
 import { getGalleryImages, uploadGalleryImage, deleteGalleryImage } from '../services/galleryService'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import ErrorMessage from '../components/common/ErrorMessage'
+import { useImageUpload } from '../hooks/useImageUpload'
 
 export default function Gallery() {
   const { currentUser } = useAuth()
@@ -12,52 +14,45 @@ export default function Gallery() {
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
 
+  const [error, setError] = useState<string | null>(null)
+
   // Upload form state
-  const [uploadFile, setUploadFile] = useState<File | null>(null)
   const [uploadTitle, setUploadTitle] = useState('')
   const [uploadDescription, setUploadDescription] = useState('')
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const {
+    imageFile: uploadFile,
+    imagePreview: previewUrl,
+    error: uploadImageError,
+    handleImageChange: handleFileChange,
+    handleRemoveImage: resetUploadPreview,
+  } = useImageUpload()
 
   useEffect(() => {
     loadImages()
   }, [])
 
+  // ESC key handler for modals
   useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (selectedImage) setSelectedImage(null)
+        else if (showUploadModal) closeUploadModal()
       }
     }
-  }, [previewUrl])
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [selectedImage, showUploadModal])
 
   const loadImages = async () => {
+    setError(null)
     try {
       const data = await getGalleryImages()
       setImages(data)
-    } catch (error) {
-      console.error('갤러리 로딩 실패:', error)
+    } catch (err) {
+      console.error('갤러리 로딩 실패:', err)
+      setError('갤러리를 불러오는 데 실패했습니다.')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('파일 크기는 5MB 이하여야 합니다.')
-        return
-      }
-      if (!file.type.startsWith('image/')) {
-        alert('이미지 파일만 업로드할 수 있습니다.')
-        return
-      }
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-      setUploadFile(file)
-      const url = URL.createObjectURL(file)
-      setPreviewUrl(url)
     }
   }
 
@@ -76,8 +71,8 @@ export default function Gallery() {
       setImages((prev) => [newImage, ...prev])
       resetUploadForm()
       setShowUploadModal(false)
-    } catch (error) {
-      console.error('업로드 실패:', error)
+    } catch (err) {
+      console.error('업로드 실패:', err)
       alert('업로드에 실패했습니다.')
     } finally {
       setUploading(false)
@@ -103,20 +98,16 @@ export default function Gallery() {
     }
   }
 
-  const resetUploadForm = () => {
-    setUploadFile(null)
+  const resetUploadForm = useCallback(() => {
+    resetUploadPreview()
     setUploadTitle('')
     setUploadDescription('')
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl)
-      setPreviewUrl(null)
-    }
-  }
+  }, [resetUploadPreview])
 
-  const closeUploadModal = () => {
+  const closeUploadModal = useCallback(() => {
     resetUploadForm()
     setShowUploadModal(false)
-  }
+  }, [resetUploadForm])
 
   if (loading) {
     return <LoadingSpinner />
@@ -149,8 +140,11 @@ export default function Gallery() {
             </div>
           )}
 
+          {/* Error State */}
+          {error && <ErrorMessage message={error} onRetry={loadImages} />}
+
           {/* Gallery Grid */}
-          {images.length === 0 ? (
+          {!error && images.length === 0 ? (
             <div className="card p-12 text-center">
               <div className="text-5xl mb-4">📷</div>
               <p className="text-gray-500 mb-2">아직 등록된 사진이 없습니다</p>
@@ -170,6 +164,7 @@ export default function Gallery() {
                     src={image.imageURL}
                     alt={image.title}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -186,13 +181,14 @@ export default function Gallery() {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-label="사진 업로드">
           <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">사진 업로드</h3>
               <button
                 onClick={closeUploadModal}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="업로드 모달 닫기"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -204,16 +200,20 @@ export default function Gallery() {
               {/* File Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">사진 선택</label>
+                {uploadImageError && (
+                  <p className="text-sm text-red-500 mb-2" role="alert">{uploadImageError}</p>
+                )}
                 {previewUrl ? (
                   <div className="relative">
                     <img
                       src={previewUrl}
-                      alt="Preview"
+                      alt="업로드 미리보기"
                       className="w-full h-48 object-cover rounded-lg"
                     />
                     <button
-                      onClick={resetUploadForm}
+                      onClick={resetUploadPreview}
                       className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                      aria-label="선택한 이미지 제거"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -287,6 +287,9 @@ export default function Gallery() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
           onClick={() => setSelectedImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={selectedImage.title}
         >
           <div
             className="relative max-w-4xl w-full"
@@ -296,6 +299,7 @@ export default function Gallery() {
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute -top-12 right-0 p-2 text-white/70 hover:text-white transition-colors"
+              aria-label="이미지 뷰어 닫기"
             >
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

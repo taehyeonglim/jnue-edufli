@@ -51,10 +51,15 @@ export const deleteGalleryImage = async (imageId: string, imageURL: string): Pro
   // Delete from Firestore
   await deleteDoc(doc(db, 'gallery', imageId))
 
-  // Delete from Storage
+  // Delete from Storage - Firebase 다운로드 URL에서 경로 추출
   try {
-    const storageRef = ref(storage, imageURL)
-    await deleteObject(storageRef)
+    const url = new URL(imageURL)
+    const pathMatch = decodeURIComponent(url.pathname).match(/\/o\/(.+)$/)
+    if (pathMatch) {
+      const storagePath = pathMatch[1]
+      const storageRef = ref(storage, storagePath)
+      await deleteObject(storageRef)
+    }
   } catch (error) {
     console.error('Storage 삭제 실패:', error)
   }

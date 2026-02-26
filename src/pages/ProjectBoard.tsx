@@ -1,30 +1,14 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { getPosts } from '../services/postService'
-import { Post, POINT_VALUES, CATEGORY_INFO } from '../types'
+import { POINT_VALUES, CATEGORY_INFO } from '../types'
+import { useBoardPosts } from '../hooks/useBoardPosts'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import ErrorMessage from '../components/common/ErrorMessage'
 import PostItem from '../components/common/PostItem'
 
 export default function ProjectBoard() {
   const { currentUser } = useAuth()
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    loadPosts()
-  }, [])
-
-  const loadPosts = async () => {
-    try {
-      const { posts: data } = await getPosts('project', 50)
-      setPosts(data)
-    } catch (error) {
-      console.error('게시글 로딩 실패:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { posts, loading, error, reload } = useBoardPosts('project', 50)
 
   if (loading) {
     return <LoadingSpinner />
@@ -56,8 +40,10 @@ export default function ProjectBoard() {
             </div>
           )}
 
-          {/* Posts */}
-          {posts.length === 0 ? (
+          {/* Error State */}
+          {error ? (
+            <ErrorMessage message={error} onRetry={reload} />
+          ) : posts.length === 0 ? (
             <div className="card text-center py-16">
               <div className="text-5xl mb-4">{CATEGORY_INFO.project.icon}</div>
               <p className="text-gray-500 mb-6">아직 등록된 프로젝트가 없습니다</p>

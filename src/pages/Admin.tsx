@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
-import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore'
+import { useState, useEffect, useMemo } from 'react'
+import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, limit } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { useAuth, calculateTier } from '../contexts/AuthContext'
 import { User, Reward, TIER_INFO } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import ErrorMessage from '../components/common/ErrorMessage'
 import { Navigate } from 'react-router-dom'
 import { adminAdjustPoints, adminSetRole, adminDeleteUser } from '../services/adminService'
 
@@ -21,14 +22,17 @@ export default function Admin() {
   const [users, setUsers] = useState<User[]>([])
   const [rewards, setRewards] = useState<Reward[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadData()
   }, [])
 
   const loadData = async () => {
+    setError(null)
     try {
-      const usersSnap = await getDocs(collection(db, 'users'))
+      const usersQuery = query(collection(db, 'users'), orderBy('points', 'desc'), limit(500))
+      const usersSnap = await getDocs(usersQuery)
       const usersData = usersSnap.docs
         .map((doc) => {
           const data = doc.data()
@@ -56,6 +60,7 @@ export default function Admin() {
       setRewards(rewardsData)
     } catch (error) {
       console.error('데이터 로딩 실패:', error)
+      setError('데이터를 불러오는 데 실패했습니다.')
     } finally {
       setLoading(false)
     }
@@ -84,6 +89,8 @@ export default function Admin() {
 
       <div className="section">
         <div className="container">
+          {error && <ErrorMessage message={error} onRetry={loadData} />}
+
           {/* Stats Overview */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
             <StatCard label="전체 회원" value={users.length} icon="👥" />
@@ -150,12 +157,15 @@ function StatCard({ label, value, icon }: { label: string; value: number; icon: 
 function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) {
   const [search, setSearch] = useState('')
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.displayName.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase()) ||
-      (user.nickname && user.nickname.toLowerCase().includes(search.toLowerCase()))
-  )
+  const filteredUsers = useMemo(() => {
+    const searchLower = search.toLowerCase()
+    return users.filter(
+      (user) =>
+        user.displayName.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower) ||
+        (user.nickname && user.nickname.toLowerCase().includes(searchLower))
+    )
+  }, [users, search])
 
   const toggleAdmin = async (user: User) => {
     if (!window.confirm(`${user.nickname || user.displayName}의 관리자 권한을 ${user.isAdmin ? '해제' : '부여'}하시겠습니까?`)) {
@@ -170,6 +180,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
       onUpdate()
     } catch (error) {
       console.error('권한 변경 실패:', error)
+      alert('권한 변경에 실패했습니다.')
     }
   }
 
@@ -188,6 +199,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
       onUpdate()
     } catch (error) {
       console.error('포인트 조정 실패:', error)
+      alert('포인트 조정에 실패했습니다.')
     }
   }
 
@@ -232,6 +244,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
       onUpdate()
     } catch (error) {
       console.error('테스트 계정 변경 실패:', error)
+      alert('테스트 계정 변경에 실패했습니다.')
     }
   }
 
@@ -397,6 +410,7 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
       onUpdate()
     } catch (error) {
       console.error('챌린저 변경 실패:', error)
+      alert('챌린저 변경에 실패했습니다.')
     }
   }
 

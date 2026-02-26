@@ -138,7 +138,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setCurrentUser(userData)
         } catch (error) {
           console.error('사용자 데이터 로딩 실패:', error)
-          setCurrentUser(null)
+          // 네트워크 오류일 수 있으므로 재시도 1회
+          try {
+            const userData = await fetchUserData(user)
+            setCurrentUser(userData)
+          } catch {
+            setCurrentUser(null)
+          }
         }
       } else {
         setCurrentUser(null)

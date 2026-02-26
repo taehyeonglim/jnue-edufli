@@ -1,132 +1,67 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { createPost, uploadPostImage } from '../services/postService'
-import { Post, POINT_VALUES } from '../types'
+import { POINT_VALUES, CategoryType, CATEGORY_INFO } from '../types'
+import { useImageUpload } from '../hooks/useImageUpload'
+
+const VALID_CATEGORIES: CategoryType[] = ['introduction', 'study', 'project', 'resources']
 
 export default function WritePost() {
   const { currentUser, refreshUser } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const category = (searchParams.get('category') || 'study') as Post['category']
+  const rawCategory = searchParams.get('category') || 'study'
+  const category: CategoryType = VALID_CATEGORIES.includes(rawCategory as CategoryType)
+    ? (rawCategory as CategoryType)
+    : 'study'
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const {
+    imageFile,
+    imagePreview,
+    error: imageError,
+    fileInputRef,
+    handleImageChange,
+    handlePaste,
+    handleRemoveImage,
+  } = useImageUpload()
 
-  useEffect(() => {
-    return () => {
-      if (imagePreview?.startsWith('blob:')) {
-        URL.revokeObjectURL(imagePreview)
-      }
-    }
-  }, [imagePreview])
-
-  const getCategoryInfo = () => {
-    switch (category) {
-      case 'introduction':
-        return {
-          label: '자기소개',
-          icon: '👋',
-          link: '/introduction',
-          points: POINT_VALUES.INTRODUCTION,
-          titlePlaceholder: '자기소개 제목을 입력하세요',
-          contentPlaceholder: '자신을 소개해주세요! 학과, 관심 분야, 하고 싶은 활동 등을 자유롭게 작성해보세요.',
-        }
-      case 'study':
-        return {
-          label: '스터디/세미나',
-          icon: '📖',
-          link: '/study',
-          points: POINT_VALUES.POST,
-          titlePlaceholder: '스터디/세미나 제목을 입력하세요',
-          contentPlaceholder: '스터디 모집 또는 세미나 공지를 작성해주세요. 주제, 일정, 모집 인원 등을 포함해주세요.',
-        }
-      case 'project':
-        return {
-          label: '프로젝트',
-          icon: '🚀',
-          link: '/project',
-          points: POINT_VALUES.POST,
-          titlePlaceholder: '프로젝트 제목을 입력하세요',
-          contentPlaceholder: '프로젝트 소개 또는 팀원 모집 글을 작성해주세요. 프로젝트 목표, 기술 스택, 모집 역할 등을 포함해주세요.',
-        }
-      case 'resources':
-        return {
-          label: '자료실',
-          icon: '📁',
-          link: '/resources',
-          points: POINT_VALUES.RESOURCE_UPLOAD,
-          titlePlaceholder: '자료 제목을 입력하세요',
-          contentPlaceholder: '공유할 교육 자료에 대한 설명을 작성해주세요. 자료 내용, 활용 방법 등을 포함해주세요.',
-        }
-      default:
-        return {
-          label: '스터디/세미나',
-          icon: '📖',
-          link: '/study',
-          points: POINT_VALUES.POST,
-          titlePlaceholder: '제목을 입력하세요',
-          contentPlaceholder: '자유롭게 글을 작성해주세요.',
-        }
-    }
+  const CATEGORY_PLACEHOLDERS: Record<CategoryType, { titlePlaceholder: string; contentPlaceholder: string }> = {
+    introduction: {
+      titlePlaceholder: '자기소개 제목을 입력하세요',
+      contentPlaceholder: '자신을 소개해주세요! 학과, 관심 분야, 하고 싶은 활동 등을 자유롭게 작성해보세요.',
+    },
+    study: {
+      titlePlaceholder: '스터디/세미나 제목을 입력하세요',
+      contentPlaceholder: '스터디 모집 또는 세미나 공지를 작성해주세요. 주제, 일정, 모집 인원 등을 포함해주세요.',
+    },
+    project: {
+      titlePlaceholder: '프로젝트 제목을 입력하세요',
+      contentPlaceholder: '프로젝트 소개 또는 팀원 모집 글을 작성해주세요. 프로젝트 목표, 기술 스택, 모집 역할 등을 포함해주세요.',
+    },
+    resources: {
+      titlePlaceholder: '자료 제목을 입력하세요',
+      contentPlaceholder: '공유할 교육 자료에 대한 설명을 작성해주세요. 자료 내용, 활용 방법 등을 포함해주세요.',
+    },
   }
 
-  const categoryInfo = getCategoryInfo()
-
-  const processImageFile = (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      setError('이미지 크기는 5MB 이하여야 합니다.')
-      return false
-    }
-    if (!file.type.startsWith('image/')) {
-      setError('이미지 파일만 업로드할 수 있습니다.')
-      return false
-    }
-    setImageFile(file)
-    if (imagePreview?.startsWith('blob:')) {
-      URL.revokeObjectURL(imagePreview)
-    }
-    setImagePreview(URL.createObjectURL(file))
-    setError('')
-    return true
+  const CATEGORY_LINKS: Record<CategoryType, string> = {
+    introduction: '/introduction',
+    study: '/study',
+    project: '/project',
+    resources: '/resources',
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      processImageFile(file)
-    }
-  }
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items
-    if (!items) return
-
-    for (const item of items) {
-      if (item.type.startsWith('image/')) {
-        e.preventDefault()
-        const file = item.getAsFile()
-        if (file) {
-          processImageFile(file)
-        }
-        break
-      }
-    }
-  }
-
-  const handleRemoveImage = () => {
-    if (imagePreview) URL.revokeObjectURL(imagePreview)
-    setImageFile(null)
-    setImagePreview(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
+  const info = CATEGORY_INFO[category]
+  const placeholders = CATEGORY_PLACEHOLDERS[category]
+  const categoryLink = CATEGORY_LINKS[category]
+  const categoryPoints = category === 'introduction' ? POINT_VALUES.INTRODUCTION
+    : category === 'resources' ? POINT_VALUES.RESOURCE_UPLOAD
+    : POINT_VALUES.POST
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -187,9 +122,9 @@ export default function WritePost() {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          <Link to={categoryInfo.link} className="hover:text-blue-600 transition-colors flex items-center gap-1">
-            <span>{categoryInfo.icon}</span>
-            <span>{categoryInfo.label}</span>
+          <Link to={categoryLink} className="hover:text-blue-600 transition-colors flex items-center gap-1">
+            <span>{info.icon}</span>
+            <span>{info.name}</span>
           </Link>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -201,21 +136,21 @@ export default function WritePost() {
           {/* Header */}
           <div className="card-header flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{categoryInfo.icon}</span>
-              <h1 className="heading-3 text-blue-600">{categoryInfo.label}</h1>
+              <span className="text-2xl">{info.icon}</span>
+              <h1 className="heading-3 text-blue-600">{info.name}</h1>
             </div>
             <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-sm font-bold rounded-full shadow-lg shadow-primary-500/30">
-              ✨ +{categoryInfo.points}P
+              ✨ +{categoryPoints}P
             </span>
           </div>
 
           <div className="card-body">
-            {error && (
-              <div className="mb-5 p-4 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-400 flex items-center gap-2">
+            {(error || imageError) && (
+              <div className="mb-5 p-4 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-400 flex items-center gap-2" role="alert">
                 <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{error}</span>
+                <span>{error || imageError}</span>
               </div>
             )}
 
@@ -229,7 +164,7 @@ export default function WritePost() {
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder={categoryInfo.titlePlaceholder}
+                  placeholder={placeholders.titlePlaceholder}
                   className="input"
                   maxLength={100}
                 />
@@ -244,7 +179,7 @@ export default function WritePost() {
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   onPaste={handlePaste}
-                  placeholder={categoryInfo.contentPlaceholder}
+                  placeholder={placeholders.contentPlaceholder}
                   className="input textarea h-64"
                   maxLength={5000}
                 />

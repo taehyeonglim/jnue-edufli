@@ -340,7 +340,10 @@ export default function MyPage() {
                       className="input"
                       maxLength={20}
                     />
-                    <p className="text-xs text-slate-500 mt-1.5">다른 회원들에게 보여지는 이름입니다.</p>
+                    <div className="flex justify-between mt-1.5">
+                      <p className="text-xs text-slate-500">다른 회원들에게 보여지는 이름입니다.</p>
+                      <span className="text-xs text-slate-400">{nickname.length}/20</span>
+                    </div>
                   </div>
 
                   <div>

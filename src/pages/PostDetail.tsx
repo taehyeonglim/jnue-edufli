@@ -217,8 +217,9 @@ export default function PostDetail() {
               <div className="mt-4">
                 <img
                   src={post.imageURL}
-                  alt="첨부 이미지"
+                  alt={`${post.title} 첨부 이미지`}
                   className="w-full max-h-[500px] object-contain rounded-lg border border-gray-200 bg-gray-50 cursor-pointer hover:opacity-90 transition-opacity"
+                  loading="lazy"
                   onClick={() => window.open(post.imageURL, '_blank')}
                 />
               </div>
