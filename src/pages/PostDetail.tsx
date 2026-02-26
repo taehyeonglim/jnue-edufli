@@ -63,8 +63,8 @@ export default function PostDetail() {
         return {
           ...prev,
           likes: liked
-            ? Array.from(new Set([...prev.likes, currentUser.uid]))
-            : prev.likes.filter((uid) => uid !== currentUser.uid),
+            ? Array.from(new Set([...(prev.likes || []), currentUser.uid]))
+            : (prev.likes || []).filter((uid) => uid !== currentUser.uid),
         }
       })
       await refreshUser()
@@ -155,7 +155,8 @@ export default function PostDetail() {
   const categoryInfo = getCategoryRoute(post.category)
   const isAuthor = currentUser?.uid === post.authorId
   const isAdmin = currentUser?.isAdmin
-  const isLiked = currentUser && post.likes.includes(currentUser.uid)
+  const likes = post.likes || []
+  const isLiked = currentUser && likes.includes(currentUser.uid)
   const tierInfo = TIER_INFO[post.authorTier] || TIER_INFO.bronze
 
   return (
@@ -272,7 +273,7 @@ export default function PostDetail() {
             size='small'
             sx={{ borderRadius: 5, textTransform: 'none' }}
           >
-            {post.likes.length}
+            {likes.length}
           </Button>
           <Typography variant='body2' color='text.secondary'>
             댓글 {post.comments.length}개

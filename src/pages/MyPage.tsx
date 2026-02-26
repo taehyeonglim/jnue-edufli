@@ -382,8 +382,8 @@ export default function MyPage() {
         {/* Stats */}
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, mb: 3 }}>
           <StatCard label="작성글" value={posts.length} icon="📝" />
-          <StatCard label="받은 좋아요" value={posts.reduce((sum, post) => sum + post.likes.length, 0)} icon="❤️" />
-          <StatCard label="받은 댓글" value={posts.reduce((sum, post) => sum + post.comments.length, 0)} icon="💬" />
+          <StatCard label="받은 좋아요" value={posts.reduce((sum, post) => sum + (post.likes || []).length, 0)} icon="❤️" />
+          <StatCard label="받은 댓글" value={posts.reduce((sum, post) => sum + (post.comments || []).length, 0)} icon="💬" />
         </Box>
 
         {/* Tabs */}
@@ -558,7 +558,7 @@ export default function MyPage() {
                       <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexShrink: 0 }}>
                         <Stack direction="row" alignItems="center" spacing={0.5}>
                           <FavoriteIcon sx={{ fontSize: 14, color: 'error.light' }} />
-                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>{post.likes.length}</Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>{(post.likes || []).length}</Typography>
                         </Stack>
                         <Stack direction="row" alignItems="center" spacing={0.5}>
                           <ChatBubbleOutlineIcon sx={{ fontSize: 14, color: 'text.secondary' }} />

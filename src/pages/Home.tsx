@@ -434,29 +434,37 @@ function MemberCard({ member, rank, isAdmin }: { member: User; rank: number; isA
             position: 'absolute',
             inset: 0,
             borderRadius: 4,
-            p: 2,
+            px: 1.5,
+            py: 1.5,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 1.5,
+            gap: 0.75,
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
             bgcolor: 'background.paper',
             border: 1,
             borderColor: 'primary.100',
+            overflow: 'hidden',
           }}
         >
-          <Typography sx={{ fontSize: '2.5rem', mb: 1 }}>{tierInfo.emoji}</Typography>
-          <Box sx={{ width: '100%', textAlign: 'center' }}>
-            <Typography variant="caption" sx={{ color: 'text.disabled' }}>학과</Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Typography sx={{ fontSize: '1.5rem', lineHeight: 1 }}>{tierInfo.emoji}</Typography>
+          <Box sx={{ width: '100%', textAlign: 'center', minWidth: 0 }}>
+            <Typography sx={{ fontSize: '0.625rem', color: 'text.disabled', lineHeight: 1.2 }}>이름</Typography>
+            <Typography sx={{ fontSize: '0.8125rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
+              {member.realName || member.displayName || '미등록'}
+            </Typography>
+          </Box>
+          <Box sx={{ width: '100%', textAlign: 'center', minWidth: 0 }}>
+            <Typography sx={{ fontSize: '0.625rem', color: 'text.disabled', lineHeight: 1.2 }}>학과</Typography>
+            <Typography sx={{ fontSize: '0.6875rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
               {member.department || '미등록'}
             </Typography>
           </Box>
-          <Box sx={{ width: '100%', textAlign: 'center' }}>
-            <Typography variant="caption" sx={{ color: 'text.disabled' }}>관심분야</Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Box sx={{ width: '100%', textAlign: 'center', minWidth: 0 }}>
+            <Typography sx={{ fontSize: '0.625rem', color: 'text.disabled', lineHeight: 1.2 }}>관심분야</Typography>
+            <Typography sx={{ fontSize: '0.6875rem', fontWeight: 600, color: 'primary.main', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
               {member.interests && member.interests.length > 0
                 ? member.interests.slice(0, 2).join(', ')
                 : '미등록'}

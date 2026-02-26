@@ -106,7 +106,7 @@ export default function Header() {
         }}
       />
 
-      <Toolbar sx={{ maxWidth: 1280, width: '100%', mx: 'auto', px: { xs: 2, sm: 3 } }}>
+      <Toolbar sx={{ maxWidth: 1280, width: '100%', mx: 'auto', px: { xs: 2, sm: 3 }, flexWrap: 'nowrap', minHeight: { xs: 56, sm: 64 } }}>
         {/* Logo */}
         <Box
           component={Link}
@@ -151,6 +151,8 @@ export default function Header() {
             display: { xs: 'none', md: 'flex' },
             alignItems: 'center',
             gap: 0.5,
+            flexWrap: 'nowrap',
+            flexShrink: 0,
           }}
         >
           {navLinks.map((link) => (
@@ -160,13 +162,15 @@ export default function Header() {
               to={link.path}
               size="small"
               sx={{
-                px: 2,
-                py: 1,
+                px: 1.5,
+                py: 0.75,
                 borderRadius: 3,
-                fontSize: '0.875rem',
+                fontSize: '0.8125rem',
                 fontWeight: isActive(link.path) ? 600 : 500,
                 color: isActive(link.path) ? 'primary.main' : 'text.secondary',
                 bgcolor: isActive(link.path) ? 'primary.50' : 'transparent',
+                whiteSpace: 'nowrap',
+                minWidth: 'auto',
                 '&:hover': {
                   bgcolor: isActive(link.path) ? 'primary.50' : 'action.hover',
                 },
@@ -183,13 +187,15 @@ export default function Header() {
               size="small"
               startIcon={<SettingsIcon sx={{ fontSize: '1rem' }} />}
               sx={{
-                px: 2,
-                py: 1,
+                px: 1.5,
+                py: 0.75,
                 borderRadius: 3,
-                fontSize: '0.875rem',
+                fontSize: '0.8125rem',
                 fontWeight: isActive('/admin') ? 600 : 500,
                 color: isActive('/admin') ? 'warning.dark' : 'warning.main',
                 bgcolor: isActive('/admin') ? 'warning.50' : 'transparent',
+                whiteSpace: 'nowrap',
+                minWidth: 'auto',
                 '&:hover': { bgcolor: 'rgba(245, 158, 11, 0.08)' },
               }}
             >

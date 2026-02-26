@@ -79,13 +79,13 @@ const PostItem = memo(function PostItem({ post, isLast }: PostItemProps) {
       <Stack direction="row" spacing={0.75} sx={{ flexShrink: 0 }}>
         <Chip
           icon={<FavoriteIcon sx={{ fontSize: 14 }} />}
-          label={post.likes.length}
+          label={(post.likes || []).length}
           size="small"
           sx={{ bgcolor: 'error.50', color: 'error.main', fontSize: '0.75rem', '& .MuiChip-icon': { color: 'error.light' } }}
         />
         <Chip
           icon={<ChatBubbleOutlineIcon sx={{ fontSize: 14 }} />}
-          label={post.comments.length}
+          label={(post.comments || []).length}
           size="small"
           variant="outlined"
           sx={{ fontSize: '0.75rem' }}

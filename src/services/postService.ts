@@ -96,6 +96,7 @@ function parsePost(docId: string, data: DocumentData): Post {
     ...data,
     createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
     updatedAt: (data.updatedAt as Timestamp)?.toDate() || new Date(),
+    likes: Array.isArray(data.likes) ? data.likes : [],
     comments: Array.isArray(data.comments)
       ? data.comments.map((comment: Comment & { createdAt: Timestamp | Date }) => ({
           ...comment,
