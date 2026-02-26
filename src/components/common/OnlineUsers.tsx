@@ -78,26 +78,26 @@ export default function OnlineUsers() {
 
   return (
     <div className="fixed bottom-8 right-5 z-40">
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 w-72 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-72 overflow-hidden">
         {/* Header */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
         >
           <div className="flex items-center gap-2.5 ml-2">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
             </span>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-slate-700">
               접속 중
             </span>
-            <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-semibold">
+            <span className="px-2.5 py-1 bg-primary-50 text-primary-600 rounded-full text-xs font-semibold">
               {onlineUsers.length}
             </span>
           </div>
           <svg
-            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -108,10 +108,10 @@ export default function OnlineUsers() {
 
         {/* User List */}
         {isExpanded && (
-          <div className="border-t border-gray-100">
+          <div className="border-t border-slate-100">
             {onlineUsers.length === 0 ? (
               <div className="px-5 py-6 text-center">
-                <p className="text-sm text-gray-400">접속 중인 유저가 없습니다</p>
+                <p className="text-sm text-slate-400">접속 중인 유저가 없습니다</p>
               </div>
             ) : (
               <div className="py-2">
@@ -122,24 +122,24 @@ export default function OnlineUsers() {
                       key={user.uid}
                       className={`px-4 py-2.5 flex items-center gap-3 transition-colors ${
                         user.uid === currentUser.uid
-                          ? 'bg-blue-50'
-                          : 'hover:bg-gray-50'
+                          ? 'bg-primary-50'
+                          : 'hover:bg-slate-50'
                       }`}
                     >
                       <div className="relative shrink-0">
                         <img
                           src={user.photoURL || '/default-avatar.svg'}
                           alt={user.nickname || user.displayName}
-                          className="w-8 h-8 rounded-full ring-1 ring-gray-200 object-cover"
+                          className="w-8 h-8 rounded-full ring-1 ring-slate-200 object-cover"
                         />
                         <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full ring-2 ring-white"></span>
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-slate-900 truncate">
                           {user.nickname || user.displayName}
                           {user.uid === currentUser.uid && (
-                            <span className="text-xs text-blue-500 ml-1">(나)</span>
+                            <span className="text-xs text-primary-500 ml-1">(나)</span>
                           )}
                         </p>
                         <div className="flex items-center gap-1.5">
@@ -175,7 +175,7 @@ export default function OnlineUsers() {
               ))}
             </div>
             {onlineUsers.length > 4 && (
-              <span className="text-xs text-gray-400 ml-2.5">
+              <span className="text-xs text-slate-400 ml-2.5">
                 +{onlineUsers.length - 4}
               </span>
             )}

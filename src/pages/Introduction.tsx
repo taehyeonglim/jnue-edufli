@@ -1,30 +1,14 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { getPosts } from '../services/postService'
-import { Post, POINT_VALUES } from '../types'
+import { POINT_VALUES } from '../types'
+import { useBoardPosts } from '../hooks/useBoardPosts'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import ErrorMessage from '../components/common/ErrorMessage'
 import PostItem from '../components/common/PostItem'
 
 export default function Introduction() {
   const { currentUser } = useAuth()
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    loadPosts()
-  }, [])
-
-  const loadPosts = async () => {
-    try {
-      const { posts: data } = await getPosts('introduction', 50)
-      setPosts(data)
-    } catch (error) {
-      console.error('게시글 로딩 실패:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { posts, loading, error, reload } = useBoardPosts('introduction', 50)
 
   const hasIntroduction = posts.some((post) => post.authorId === currentUser?.uid)
 
@@ -57,11 +41,13 @@ export default function Introduction() {
             </div>
           )}
 
-          {/* Posts */}
-          {posts.length === 0 ? (
+          {/* Error State */}
+          {error ? (
+            <ErrorMessage message={error} onRetry={reload} />
+          ) : posts.length === 0 ? (
             <div className="card text-center py-16">
               <div className="text-5xl mb-4">👋</div>
-              <p className="text-gray-500 mb-6">아직 자기소개가 없습니다</p>
+              <p className="text-slate-500 mb-6">아직 자기소개가 없습니다</p>
               {currentUser && (
                 <Link to="/write?category=introduction" className="btn btn-primary">
                   첫 자기소개 작성하기

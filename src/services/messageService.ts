@@ -9,6 +9,7 @@ import {
   query,
   where,
   orderBy,
+  limit,
   serverTimestamp,
   Timestamp
 } from 'firebase/firestore'
@@ -45,7 +46,8 @@ export async function getReceivedMessages(userId: string): Promise<Message[]> {
   const q = query(
     collection(db, MESSAGES_COLLECTION),
     where('receiverId', '==', userId),
-    orderBy('createdAt', 'desc')
+    orderBy('createdAt', 'desc'),
+    limit(100)
   )
 
   const snapshot = await getDocs(q)
@@ -60,7 +62,8 @@ export async function getSentMessages(userId: string): Promise<Message[]> {
   const q = query(
     collection(db, MESSAGES_COLLECTION),
     where('senderId', '==', userId),
-    orderBy('createdAt', 'desc')
+    orderBy('createdAt', 'desc'),
+    limit(100)
   )
 
   const snapshot = await getDocs(q)

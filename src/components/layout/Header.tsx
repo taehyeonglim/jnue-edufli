@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { TIER_INFO } from '../../types'
@@ -20,15 +20,7 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  useEffect(() => {
-    if (currentUser) {
-      loadUnreadCount()
-      const interval = setInterval(loadUnreadCount, 30000)
-      return () => clearInterval(interval)
-    }
-  }, [currentUser])
-
-  const loadUnreadCount = async () => {
+  const loadUnreadCount = useCallback(async () => {
     if (!currentUser) return
     try {
       const count = await getUnreadCount(currentUser.uid)
@@ -36,7 +28,15 @@ export default function Header() {
     } catch (error) {
       console.error('읽지 않은 쪽지 수 로딩 실패:', error)
     }
-  }
+  }, [currentUser])
+
+  useEffect(() => {
+    if (currentUser) {
+      loadUnreadCount()
+      const interval = setInterval(loadUnreadCount, 30000)
+      return () => clearInterval(interval)
+    }
+  }, [currentUser, loadUnreadCount])
 
   const handleSignIn = async () => {
     try {
@@ -149,6 +149,7 @@ export default function Header() {
                 <Link
                   to="/messages"
                   className="relative p-2.5 rounded-xl text-slate-400 hover:text-primary-500 hover:bg-primary-50/50 transition-all duration-200"
+                  aria-label={`쪽지함${unreadMessages > 0 ? ` (안읽은 쪽지 ${unreadMessages}개)` : ''}`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -191,6 +192,7 @@ export default function Header() {
                 <button
                   onClick={handleSignOut}
                   className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-sm text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100/80 transition-all duration-200"
+                  aria-label="로그아웃"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -217,6 +219,8 @@ export default function Header() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100/80 transition-all duration-200"
+              aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+              aria-expanded={mobileMenuOpen}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileMenuOpen ? (

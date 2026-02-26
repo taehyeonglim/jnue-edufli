@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { sendMessage } from '../../services/messageService'
 import { User, TIER_INFO } from '../../types'
@@ -21,6 +21,14 @@ export default function SendMessageModal({
   const [error, setError] = useState('')
 
   const tierInfo = TIER_INFO[receiver.tier] || TIER_INFO.bronze
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,21 +68,21 @@ export default function SendMessageModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="쪽지 보내기">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-lg border border-gray-200 w-full max-w-lg shadow-2xl">
+      <div className="relative bg-white rounded-2xl w-full max-w-lg shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <span className="text-xl">💌</span>
-            <h2 className="text-lg font-semibold text-blue-600">쪽지 보내기</h2>
+            <h2 className="text-lg font-semibold text-primary-600">쪽지 보내기</h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-900 transition-colors"
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
             aria-label="쪽지 보내기 닫기"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,15 +94,15 @@ export default function SendMessageModal({
         {/* Body */}
         <form onSubmit={handleSubmit} className="p-6">
           {/* Receiver Info */}
-          <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded border border-gray-200">
-            <span className="text-sm text-gray-500">받는 사람:</span>
+          <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded border border-slate-200">
+            <span className="text-sm text-slate-500">받는 사람:</span>
             <img
               src={receiver.photoURL || '/default-avatar.svg'}
               alt={receiver.nickname || receiver.displayName}
               className="avatar avatar-sm"
               style={{ borderColor: tierInfo.color }}
             />
-            <span className="font-medium text-gray-900">
+            <span className="font-medium text-slate-900">
               {receiver.nickname || receiver.displayName}
             </span>
             <span className="text-sm" style={{ color: tierInfo.color }}>
@@ -110,7 +118,7 @@ export default function SendMessageModal({
 
           {/* Title */}
           <div className="mb-4">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-900 mb-2">
+            <label htmlFor="title" className="block text-sm font-medium text-slate-900 mb-2">
               제목
             </label>
             <input
@@ -126,7 +134,7 @@ export default function SendMessageModal({
 
           {/* Content */}
           <div className="mb-4">
-            <label htmlFor="content" className="block text-sm font-medium text-gray-900 mb-2">
+            <label htmlFor="content" className="block text-sm font-medium text-slate-900 mb-2">
               내용
             </label>
             <textarea
@@ -138,7 +146,7 @@ export default function SendMessageModal({
               maxLength={1000}
             />
             <div className="flex justify-end mt-1">
-              <span className="text-xs text-gray-500">{content.length} / 1000</span>
+              <span className="text-xs text-slate-500">{content.length} / 1000</span>
             </div>
           </div>
 

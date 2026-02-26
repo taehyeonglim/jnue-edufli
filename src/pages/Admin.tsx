@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
-import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore'
+import { useState, useEffect, useMemo } from 'react'
+import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, limit } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { useAuth, calculateTier } from '../contexts/AuthContext'
 import { User, Reward, TIER_INFO } from '../types'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import ErrorMessage from '../components/common/ErrorMessage'
 import { Navigate } from 'react-router-dom'
 import { adminAdjustPoints, adminSetRole, adminDeleteUser } from '../services/adminService'
 
@@ -21,14 +22,17 @@ export default function Admin() {
   const [users, setUsers] = useState<User[]>([])
   const [rewards, setRewards] = useState<Reward[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadData()
   }, [])
 
   const loadData = async () => {
+    setError(null)
     try {
-      const usersSnap = await getDocs(collection(db, 'users'))
+      const usersQuery = query(collection(db, 'users'), orderBy('points', 'desc'), limit(500))
+      const usersSnap = await getDocs(usersQuery)
       const usersData = usersSnap.docs
         .map((doc) => {
           const data = doc.data()
@@ -56,6 +60,7 @@ export default function Admin() {
       setRewards(rewardsData)
     } catch (error) {
       console.error('데이터 로딩 실패:', error)
+      setError('데이터를 불러오는 데 실패했습니다.')
     } finally {
       setLoading(false)
     }
@@ -84,6 +89,8 @@ export default function Admin() {
 
       <div className="section">
         <div className="container">
+          {error && <ErrorMessage message={error} onRetry={loadData} />}
+
           {/* Stats Overview */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
             <StatCard label="전체 회원" value={users.length} icon="👥" />
@@ -107,7 +114,7 @@ export default function Admin() {
           </div>
 
           {/* Tab Description */}
-          <div className="flex items-center gap-2 mb-6 text-sm text-gray-500">
+          <div className="flex items-center gap-2 mb-6 text-sm text-slate-500">
             <span>{TAB_INFO[activeTab].icon}</span>
             <span>{TAB_INFO[activeTab].description}</span>
           </div>
@@ -139,8 +146,8 @@ function StatCard({ label, value, icon }: { label: string; value: number; icon: 
       <div className="flex items-center gap-3">
         <span className="text-2xl">{icon}</span>
         <div>
-          <p className="text-2xl font-bold text-blue-600">{value}</p>
-          <p className="text-xs text-gray-500">{label}</p>
+          <p className="text-2xl font-bold text-primary-600">{value}</p>
+          <p className="text-xs text-slate-500">{label}</p>
         </div>
       </div>
     </div>
@@ -150,12 +157,15 @@ function StatCard({ label, value, icon }: { label: string; value: number; icon: 
 function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) {
   const [search, setSearch] = useState('')
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.displayName.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase()) ||
-      (user.nickname && user.nickname.toLowerCase().includes(search.toLowerCase()))
-  )
+  const filteredUsers = useMemo(() => {
+    const searchLower = search.toLowerCase()
+    return users.filter(
+      (user) =>
+        user.displayName.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower) ||
+        (user.nickname && user.nickname.toLowerCase().includes(searchLower))
+    )
+  }, [users, search])
 
   const toggleAdmin = async (user: User) => {
     if (!window.confirm(`${user.nickname || user.displayName}의 관리자 권한을 ${user.isAdmin ? '해제' : '부여'}하시겠습니까?`)) {
@@ -170,6 +180,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
       onUpdate()
     } catch (error) {
       console.error('권한 변경 실패:', error)
+      alert('권한 변경에 실패했습니다.')
     }
   }
 
@@ -188,6 +199,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
       onUpdate()
     } catch (error) {
       console.error('포인트 조정 실패:', error)
+      alert('포인트 조정에 실패했습니다.')
     }
   }
 
@@ -232,6 +244,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
       onUpdate()
     } catch (error) {
       console.error('테스트 계정 변경 실패:', error)
+      alert('테스트 계정 변경에 실패했습니다.')
     }
   }
 
@@ -240,7 +253,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
       {/* Search */}
       <div className="card p-4">
         <div className="relative">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -251,14 +264,14 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
             className="input pl-12"
           />
         </div>
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-xs text-slate-500 mt-2">
           총 {filteredUsers.length}명의 회원
         </p>
       </div>
 
       {/* User List */}
       <div className="card overflow-hidden">
-        <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto_auto_auto] gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200">
+        <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto_auto_auto] gap-4 p-4 bg-slate-50 text-xs font-medium text-slate-500 uppercase tracking-wide border-b border-slate-200">
           <span>유저</span>
           <span className="w-24 text-center">티어</span>
           <span className="w-20 text-right">포인트</span>
@@ -271,7 +284,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
           {filteredUsers.map((user) => {
             const tierInfo = TIER_INFO[user.tier]
             return (
-              <div key={user.uid} className={`p-4 hover:bg-gray-50 transition-colors ${user.isTestAccount ? 'opacity-60' : ''}`}>
+              <div key={user.uid} className={`p-4 hover:bg-slate-50 transition-colors ${user.isTestAccount ? 'opacity-60' : ''}`}>
                 <div className="sm:grid sm:grid-cols-[1fr_auto_auto_auto_auto_auto] sm:gap-4 sm:items-center">
                   <div className="flex items-center gap-3 mb-3 sm:mb-0">
                     <img
@@ -281,11 +294,11 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
                       style={{ borderColor: tierInfo.color }}
                     />
                     <div className="min-w-0">
-                      <p className="text-gray-900 font-medium truncate">
+                      <p className="text-slate-900 font-medium truncate">
                         {user.nickname || user.displayName}
                         {user.isChallenger && <span className="ml-1.5 text-xs">{TIER_INFO.challenger.emoji}</span>}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
                     </div>
                   </div>
 
@@ -302,19 +315,19 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
                       </span>
                     </div>
 
-                    <span className="text-blue-600 font-bold sm:w-20 sm:text-right">
+                    <span className="text-primary-600 font-bold sm:w-20 sm:text-right">
                       {user.points}P
                     </span>
 
                     <span className="sm:w-16 sm:text-center hidden sm:block">
                       {user.isAdmin ? (
-                        <span className="inline-flex items-center gap-1 text-teal-500">
+                        <span className="inline-flex items-center gap-1 text-primary-500">
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
                         </span>
                       ) : (
-                        <span className="text-gray-500">-</span>
+                        <span className="text-slate-500">-</span>
                       )}
                     </span>
 
@@ -326,14 +339,14 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
                           </svg>
                         </span>
                       ) : (
-                        <span className="text-gray-500">-</span>
+                        <span className="text-slate-500">-</span>
                       )}
                     </span>
 
                     <div className="flex justify-end gap-2 sm:w-56">
                       <button
                         onClick={() => adjustPoints(user)}
-                        className="px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        className="px-3 py-1.5 text-xs font-medium text-primary-600 hover:bg-primary-50 rounded transition-colors"
                       >
                         포인트
                       </button>
@@ -342,7 +355,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
                         className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           user.isTestAccount
                             ? 'text-orange-400 hover:bg-orange-400/10'
-                            : 'text-gray-500 hover:bg-gray-100'
+                            : 'text-slate-500 hover:bg-slate-100'
                         }`}
                         title="테스트 계정 토글"
                       >
@@ -353,7 +366,7 @@ function UsersTab({ users, onUpdate }: { users: User[]; onUpdate: () => void }) 
                         className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                           user.isAdmin
                             ? 'text-red-400 hover:bg-red-400/10'
-                            : 'text-teal-500 hover:bg-teal-50'
+                            : 'text-primary-500 hover:bg-primary-50'
                         }`}
                       >
                         {user.isAdmin ? '관리자 해제' : '관리자'}
@@ -397,6 +410,7 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
       onUpdate()
     } catch (error) {
       console.error('챌린저 변경 실패:', error)
+      alert('챌린저 변경에 실패했습니다.')
     }
   }
 
@@ -408,25 +422,25 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
           <div className="flex items-center gap-3">
             <span className="text-2xl">{TIER_INFO.challenger.emoji}</span>
             <div>
-              <h2 className="heading-3 text-blue-600">현재 챌린저</h2>
-              <p className="text-sm text-gray-500">{challengers.length}명의 챌린저</p>
+              <h2 className="heading-3 text-primary-600">현재 챌린저</h2>
+              <p className="text-sm text-slate-500">{challengers.length}명의 챌린저</p>
             </div>
           </div>
         </div>
 
         <div className="card-body">
           {challengers.length === 0 ? (
-            <div className="text-center py-8">
-              <span className="text-4xl mb-3 block">👑</span>
-              <p className="text-gray-500">아직 챌린저가 없습니다</p>
-              <p className="text-sm text-gray-500">아래에서 지정해주세요</p>
+            <div className="text-center py-12">
+              <span className="text-5xl mb-4 block">👑</span>
+              <p className="text-slate-500">아직 챌린저가 없습니다</p>
+              <p className="text-sm text-slate-500">아래에서 지정해주세요</p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {challengers.map((user) => (
                 <div
                   key={user.uid}
-                  className="flex items-center gap-3 p-3 bg-gradient-to-r from-amber-50 to-transparent border border-amber-300 rounded"
+                  className="flex items-center gap-3 p-3 bg-gradient-to-r from-amber-50 to-transparent border border-amber-200 rounded"
                 >
                   <img
                     src={user.photoURL || '/default-avatar.svg'}
@@ -435,8 +449,8 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
                     style={{ borderColor: TIER_INFO.challenger.color }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-900 truncate">{user.nickname || user.displayName}</p>
-                    <p className="text-sm text-blue-600">{user.points}P</p>
+                    <p className="font-bold text-slate-900 truncate">{user.nickname || user.displayName}</p>
+                    <p className="text-sm text-primary-600">{user.points}P</p>
                   </div>
                   <button
                     onClick={() => toggleChallenger(user)}
@@ -454,8 +468,8 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
       {/* Assign Challenger */}
       <div className="card overflow-hidden">
         <div className="card-header">
-          <h2 className="heading-3 text-blue-600">챌린저 지정하기</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="heading-3 text-primary-600">챌린저 지정하기</h2>
+          <p className="text-sm text-slate-500">
             포인트 상위 유저들 중에서 챌린저를 선정하세요
           </p>
         </div>
@@ -466,9 +480,9 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
             return (
               <div
                 key={user.uid}
-                className="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+                className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors"
               >
-                <span className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-500 text-sm font-medium">
+                <span className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-500 text-sm font-medium">
                   {index + 1}
                 </span>
                 <img
@@ -478,17 +492,17 @@ function ChallengerTab({ users, onUpdate }: { users: User[]; onUpdate: () => voi
                   style={{ borderColor: tierInfo.color }}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{user.nickname || user.displayName}</p>
+                  <p className="font-medium text-slate-900 truncate">{user.nickname || user.displayName}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs" style={{ color: tierInfo.color }}>
                       {tierInfo.emoji} {tierInfo.name}
                     </span>
-                    <span className="text-sm text-blue-600 font-medium">{user.points}P</span>
+                    <span className="text-sm text-primary-600 font-medium">{user.points}P</span>
                   </div>
                 </div>
                 <button
                   onClick={() => toggleChallenger(user)}
-                  className="px-4 py-2 text-sm font-medium text-teal-500 border border-teal-300 hover:bg-teal-50 rounded transition-colors flex items-center gap-2"
+                  className="px-4 py-2 text-sm font-medium text-primary-500 border border-primary-300 hover:bg-primary-50 rounded transition-colors flex items-center gap-2"
                 >
                   <span>👑</span>
                   <span className="hidden sm:inline">챌린저 지정</span>
@@ -559,13 +573,13 @@ function RewardsTab({
         <div className="card-header">
           <div className="flex items-center gap-2">
             <span className="text-xl">🎁</span>
-            <h2 className="heading-3 text-blue-600">상품 지급</h2>
+            <h2 className="heading-3 text-primary-600">상품 지급</h2>
           </div>
         </div>
 
         <form onSubmit={handleGiveReward} className="card-body space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-slate-900 mb-2">
               대상 유저
             </label>
             <select
@@ -583,7 +597,7 @@ function RewardsTab({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-slate-900 mb-2">
               상품명
             </label>
             <input
@@ -596,7 +610,7 @@ function RewardsTab({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-slate-900 mb-2">
               설명 (선택)
             </label>
             <textarea
@@ -622,31 +636,31 @@ function RewardsTab({
         <div className="card-header flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">📋</span>
-            <h2 className="heading-3 text-blue-600">지급 내역</h2>
+            <h2 className="heading-3 text-primary-600">지급 내역</h2>
           </div>
-          <span className="text-sm text-gray-500">{rewards.length}건</span>
+          <span className="text-sm text-slate-500">{rewards.length}건</span>
         </div>
 
         <div className="max-h-[500px] overflow-y-auto">
           {rewards.length === 0 ? (
-            <div className="p-8 text-center">
-              <span className="text-4xl mb-3 block">📭</span>
-              <p className="text-gray-500">아직 지급 내역이 없습니다</p>
+            <div className="py-12 text-center">
+              <span className="text-5xl mb-4 block">📭</span>
+              <p className="text-slate-500">아직 지급 내역이 없습니다</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-slate-200">
               {rewards.map((reward) => (
-                <div key={reward.id} className="p-4 hover:bg-gray-50 transition-colors">
+                <div key={reward.id} className="p-4 hover:bg-slate-50 transition-colors">
                   <div className="flex items-start gap-3">
                     <span className="text-2xl">🎁</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900">{reward.rewardName}</p>
-                      <p className="text-sm text-blue-600">{reward.userName}</p>
+                      <p className="font-medium text-slate-900">{reward.rewardName}</p>
+                      <p className="text-sm text-primary-600">{reward.userName}</p>
                       {reward.description && (
-                        <p className="text-sm text-gray-500 mt-1">{reward.description}</p>
+                        <p className="text-sm text-slate-500 mt-1">{reward.description}</p>
                       )}
                     </div>
-                    <div className="text-right text-xs text-gray-500 shrink-0">
+                    <div className="text-right text-xs text-slate-500 shrink-0">
                       <p>{reward.givenAt.toLocaleDateString('ko-KR')}</p>
                       <p className="mt-0.5">by {reward.givenBy}</p>
                     </div>
